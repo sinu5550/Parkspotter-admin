@@ -107,7 +107,6 @@ const settingsData = [
 
 const Navbar = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [notifVisible, setNotifVisible] = useState(false);
   const [isProfileModalVisible, setIsProfileModalVisible] = useState(false);
   const [isReportsModalVisible, setIsReportsModalVisible] = useState(false);
   const [isNotificationsModalVisible, setIsNotificationsModalVisible] = useState(false);

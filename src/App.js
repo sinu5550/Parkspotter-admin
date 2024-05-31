@@ -5,13 +5,13 @@ import {
   Route,
   Navigate,
 } from "react-router-dom"
-import Analytics from "./components/Analytics"
-import ParkingZones from "./pages/ParkingZones"
-import SupportTickets from "./pages/SupportTickets"
-import AdminManagement from "./pages/AdminManagement"
+// import Analytics from "./components/Analytics"
+// import ParkingZones from "./pages/ParkingZones"
+// import SupportTickets from "./pages/SupportTickets"
+// import AdminManagement from "./pages/AdminManagement"
 import Login from "./pages/Login"
 import Dashboard from "./pages/Dashboard"
-import Parkowners from "./pages/Parkowners"
+// import Parkowners from "./pages/Parkowners"
 
 const App = () => {
   const [collapsed, setCollapsed] = useState(false)

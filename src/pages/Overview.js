@@ -19,6 +19,7 @@ import annotationPlugin from "chartjs-plugin-annotation"
 import datalabels from "chartjs-plugin-datalabels"
 import gradient from "chartjs-plugin-gradient"
 import zoomPlugin from "chartjs-plugin-zoom"
+import { Link } from "react-router-dom"
 
 ChartJS.register(
   CategoryScale,
@@ -55,25 +56,25 @@ const Greeting = styled.div`
   }
 `
 
-const DateRange = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+// const DateRange = styled.div`
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   margin-bottom: 20px;
 
-  span {
-    margin-right: 10px;
-    color: #888;
-  }
+//   span {
+//     margin-right: 10px;
+//     color: #888;
+//   }
 
-  button {
-    padding: 5px 10px;
-    background-color: #3498db;
-    color: white;
-    border: none;
-    cursor: pointer;
-  }
-`
+//   button {
+//     padding: 5px 10px;
+//     background-color: #3498db;
+//     color: white;
+//     border: none;
+//     cursor: pointer;
+//   }
+// `
 
 const SummaryStats = styled.div`
   display: flex;
@@ -249,22 +250,22 @@ const Overview = () => {
         <StatBox>
           <h2>Total Earnings</h2>
           <p className="increase">$559.25k</p>
-          <a href="#">View net earnings</a>
+          <Link to={"#"}>View net earnings</Link>
         </StatBox>
         <StatBox>
           <h2>Bookings</h2>
           <p className="decrease">36,894</p>
-          <a href="#">View all Bookings</a>
+          <Link to={"#"}>View all Bookings</Link>
         </StatBox>
         <StatBox>
           <h2>Users</h2>
           <p className="increase">183.35M</p>
-          <a href="#">See details</a>
+          <Link to={"#"}>See details</Link>
         </StatBox>
         <StatBox>
           <h2>Company Balance</h2>
           <p className="neutral">$165.89k</p>
-          <a href="#">Withdraw money</a>
+          <Link to={"#"}>Withdraw money</Link>
         </StatBox>
       </SummaryStats>
       <RevenueSection>
