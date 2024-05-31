@@ -3,7 +3,7 @@ import styled from "styled-components"
 import {
   FaSearch,
   FaFilter,
-  FaChartPie,
+  // FaChartPie,
   FaPlusCircle,
   FaTrashAlt,
 } from "react-icons/fa"

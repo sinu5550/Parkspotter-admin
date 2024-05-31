@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import ReactMapGL, { Marker, Popup, NavigationControl, FullscreenControl, ScaleControl, GeolocateControl } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-// Dummy data for parking zones in Dhaka
 const parkingZones = [
   { id: 1, name: 'Parking Zone 1', latitude: 23.8103, longitude: 90.4125, description: 'Near Bashundhara City Mall' },
   { id: 2, name: 'Parking Zone 2', latitude: 23.7945, longitude: 90.4043, description: 'Beside Dhaka University' },

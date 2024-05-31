@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import styled from "styled-components"
 import {
   FaSearch,
-  FaFilter,
+  // FaFilter,
   FaPlusCircle,
   FaTrashAlt,
   FaSort,
