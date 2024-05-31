@@ -11,7 +11,6 @@ import {
   FaUserShield, 
   FaFileInvoiceDollar,
   FaChevronDown,
-  FaUsers
 } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
@@ -45,28 +44,40 @@ const Menu = styled.nav`
     display: flex;
     flex-direction: column;
   }
+`;
 
-  a {
-    color: #ecf0f1;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    padding: 5px 0;
-    cursor: pointer;
+const MenuLink = styled(Link)`
+  color: #ecf0f1;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  padding: 5px 0;
+  cursor: pointer;
 
-    &:hover {
-      background-color: #34495e;
-      border-radius: 4px;
-      padding-left: 10px;
-    }
+  &:hover {
+    background-color: #34495e;
+    border-radius: 4px;
+    padding-left: 10px;
   }
 
   svg {
     margin-right: 10px;
   }
+`;
 
-  .submenu {
-    padding-left: 20px;
+const SubMenuLink = styled(Link)`
+  color: #ecf0f1;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  padding: 5px 0;
+  cursor: pointer;
+  padding-left: 20px;
+
+  &:hover {
+    background-color: #34495e;
+    border-radius: 4px;
+    padding-left: 25px;
   }
 `;
 
@@ -92,76 +103,76 @@ const Sidebar = ({ collapsed, toggleCollapse }) => {
       <Menu>
         <ul>
           <li>
-            <a onClick={() => toggleMenu('dashboards')}>
+            <MenuLink as="div" onClick={() => toggleMenu('dashboards')}>
               <FaChartPie />
               {!collapsed && 'Dashboards'}
               {!collapsed && (openMenus['dashboards'] ? <FaChevronDown /> : <FaChevronRight />)}
-            </a>
+            </MenuLink>
             <SubMenuList isOpen={openMenus['dashboards']}>
-              <li className="submenu">
-                <Link to="/dashboard">Overview</Link>
+              <li>
+                <SubMenuLink to="/dashboard">Overview</SubMenuLink>
               </li>
-              <li className="submenu">
-                <Link to="/dashboard/analytics">Analytics</Link>
+              <li>
+                <SubMenuLink to="/dashboard/analytics">Analytics</SubMenuLink>
               </li>
             </SubMenuList>
           </li>
           <li>
-            <a onClick={() => toggleMenu('management')}>
+            <MenuLink as="div" onClick={() => toggleMenu('management')}>
               <FaTh />
               {!collapsed && 'Management'}
               {!collapsed && (openMenus['management'] ? <FaChevronDown /> : <FaChevronRight />)}
-            </a>
+            </MenuLink>
             <SubMenuList isOpen={openMenus['management']}>
-              <li className="submenu">
-                <Link to="/dashboard/parkowners">Parkowners</Link>
+              <li>
+                <SubMenuLink to="/dashboard/parkowners">Parkowners</SubMenuLink>
               </li>
-              <li className="submenu">
-                <Link to="/dashboard/users">Users</Link>
+              <li>
+                <SubMenuLink to="/dashboard/users">Users</SubMenuLink>
               </li>
-              <li className="submenu">
-                <Link to="/dashboard/zones">Zones</Link>
+              <li>
+                <SubMenuLink to="/dashboard/zones">Zones</SubMenuLink>
               </li>
             </SubMenuList>
           </li>
           <li>
-            <a onClick={() => toggleMenu('subscriptions')}>
+            <MenuLink as="div" onClick={() => toggleMenu('subscriptions')}>
               <FaFileInvoiceDollar />
               {!collapsed && 'Subscriptions'}
               {!collapsed && (openMenus['subscriptions'] ? <FaChevronDown /> : <FaChevronRight />)}
-            </a>
+            </MenuLink>
             <SubMenuList isOpen={openMenus['subscriptions']}>
-              <li className="submenu">
-                <Link to="/dashboard/subscriptions">View Subscriptions</Link>
+              <li>
+                <SubMenuLink to="/dashboard/subscriptions">View Subscriptions</SubMenuLink>
               </li>
-              <li className="submenu">
-                <Link to="/dashboard/manage-plans">Manage Plans</Link>
+              <li>
+                <SubMenuLink to="/dashboard/manage-plans">Manage Plans</SubMenuLink>
               </li>
             </SubMenuList>
           </li>
           <li>
-            <Link to="/dashboard/bookings">
+            <MenuLink to="/dashboard/bookings">
               <FaCalendarAlt />
               {!collapsed && 'Bookings'}
-            </Link>
+            </MenuLink>
           </li>
           <li>
-            <Link to="/dashboard/parking-zones">
+            <MenuLink to="/dashboard/parking-zones">
               <FaMapMarkedAlt />
               {!collapsed && 'Parking Zones'}
-            </Link>
+            </MenuLink>
           </li>
           <li>
-            <Link to="/dashboard/support-tickets">
+            <MenuLink to="/dashboard/support-tickets">
               <FaTicketAlt />
               {!collapsed && 'Support Tickets'}
-            </Link>
+            </MenuLink>
           </li>
           <li>
-            <Link to="/dashboard/admin-management">
+            <MenuLink to="/dashboard/admin-management">
               <FaUserShield />
               {!collapsed && 'Admin Management'}
-            </Link>
+            </MenuLink>
           </li>
         </ul>
       </Menu>
@@ -170,4 +181,3 @@ const Sidebar = ({ collapsed, toggleCollapse }) => {
 };
 
 export default Sidebar;
-// original

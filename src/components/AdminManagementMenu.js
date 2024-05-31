@@ -1,25 +1,32 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { FaChevronDown, FaChevronRight, FaUserShield, FaUsers, FaFileAlt, FaCogs } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
-import { FaChevronLeft } from 'react-icons/fa';
+import React, { useState } from "react"
+import styled from "styled-components"
+import {
+  FaChevronDown,
+  FaChevronRight,
+  FaUserShield,
+  FaUsers,
+  FaFileAlt,
+  FaCogs,
+} from "react-icons/fa"
+import { Link } from "react-router-dom"
+import { FaChevronLeft } from "react-icons/fa"
 
 const SidebarContainer = styled.div`
-  width: ${props => (props.collapsed ? '80px' : '250px')};
+  width: ${(props) => (props.collapsed ? "80px" : "250px")};
   background-color: #405189;
   color: #ecf0f1;
   display: flex;
   flex-direction: column;
   padding: 20px;
   transition: width 0.3s;
-`;
+`
 
 const CollapseButton = styled.div`
   cursor: pointer;
   margin-bottom: 20px;
   display: flex;
   align-items: center;
-`;
+`
 
 const Menu = styled.nav`
   ul {
@@ -57,21 +64,21 @@ const Menu = styled.nav`
   .submenu {
     padding-left: 20px;
   }
-`;
+`
 
 const SubMenuList = styled.ul`
-  display: ${props => (props.isOpen ? 'block' : 'none')};
-`;
+  display: ${(props) => (props.isOpen ? "block" : "none")};
+`
 
 const AdminManagementMenu = ({ collapsed, toggleCollapse }) => {
-  const [openMenus, setOpenMenus] = useState({});
+  const [openMenus, setOpenMenus] = useState({})
 
   const toggleMenu = (menu) => {
-    setOpenMenus(prevState => ({
+    setOpenMenus((prevState) => ({
       ...prevState,
-      [menu]: !prevState[menu]
-    }));
-  };
+      [menu]: !prevState[menu],
+    }))
+  }
 
   return (
     <SidebarContainer collapsed={collapsed}>
@@ -81,30 +88,43 @@ const AdminManagementMenu = ({ collapsed, toggleCollapse }) => {
       <Menu>
         <ul>
           <li>
-            <a onClick={() => toggleMenu('adminManagement')}>
+            <button onClick={() => toggleMenu("adminManagement")}>
               <FaUserShield />
-              {!collapsed && 'Admin Management'}
-              {!collapsed && (openMenus['adminManagement'] ? <FaChevronDown /> : <FaChevronRight />)}
-            </a>
-            <SubMenuList isOpen={openMenus['adminManagement']}>
+              {!collapsed && "Admin Management"}
+              {!collapsed &&
+                (openMenus["adminManagement"] ? (
+                  <FaChevronDown />
+                ) : (
+                  <FaChevronRight />
+                ))}
+            </button>
+            <SubMenuList isOpen={openMenus["adminManagement"]}>
               <li className="submenu">
-                <Link to="/dashboard/admin-management/users"><FaUsers /> Users</Link>
+                <Link to="/dashboard/admin-management/users">
+                  <FaUsers /> Users
+                </Link>
               </li>
               <li className="submenu">
-                <Link to="/dashboard/admin-management/roles"><FaUserShield /> Roles</Link>
+                <Link to="/dashboard/admin-management/roles">
+                  <FaUserShield /> Roles
+                </Link>
               </li>
               <li className="submenu">
-                <Link to="/dashboard/admin-management/permissions"><FaFileAlt /> Permissions</Link>
+                <Link to="/dashboard/admin-management/permissions">
+                  <FaFileAlt /> Permissions
+                </Link>
               </li>
               <li className="submenu">
-                <Link to="/dashboard/admin-management/settings"><FaCogs /> Settings</Link>
+                <Link to="/dashboard/admin-management/settings">
+                  <FaCogs /> Settings
+                </Link>
               </li>
             </SubMenuList>
           </li>
         </ul>
       </Menu>
     </SidebarContainer>
-  );
-};
+  )
+}
 
-export default AdminManagementMenu;
+export default AdminManagementMenu

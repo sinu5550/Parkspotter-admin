@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import styled from "styled-components"
 import {
   FaSearch,
-  FaFilter,
+  // FaFilter,
   FaPlusCircle,
   FaTrashAlt,
   FaSort,
@@ -225,17 +225,17 @@ const Parkowners = () => {
     page * itemsPerPage
   )
 
-  const nextPage = () => {
-    if (page < Math.ceil(filteredParkowners.length / itemsPerPage)) {
-      setPage(page + 1)
-    }
-  }
+  // const nextPage = () => {
+  //   if (page < Math.ceil(filteredParkowners.length / itemsPerPage)) {
+  //     setPage(page + 1)
+  //   }
+  // }
 
-  const prevPage = () => {
-    if (page > 1) {
-      setPage(page - 1)
-    }
-  }
+  // const prevPage = () => {
+  //   if (page > 1) {
+  //     setPage(page - 1)
+  //   }
+  // }
 
   const revenueData = {
     labels: filteredParkowners.map((owner) => owner.name),

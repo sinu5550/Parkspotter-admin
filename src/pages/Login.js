@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import ParticlesBg from 'particles-bg';
 
@@ -117,12 +117,12 @@ const Login = ({ setLoggedIn }) => {
             <label>
               <input type="checkbox" /> Remember me
             </label>
-            <a href="#">Forgot password?</a>
+            <Link to={"#"}>Forgot password?</Link>
           </RememberMe>
           <Button type="button" onClick={handleLogin}>Sign In</Button>
         </form>
         <SignupLink>
-          Don't have an account? <a href="#">Signup</a>
+          Don't have an account? <Link to={"#"}>Signup</Link>
         </SignupLink>
       </LoginForm>
     </LoginContainer>
