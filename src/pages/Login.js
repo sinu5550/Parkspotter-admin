@@ -1,7 +1,10 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import styled, { keyframes } from 'styled-components';
 import ParticlesBg from 'particles-bg';
+import axios from 'axios';
+import toast, { Toaster } from 'react-hot-toast';
+import Swal from 'sweetalert2';
 
 const LoginContainer = styled.div`
   display: flex;
@@ -58,6 +61,15 @@ const Input = styled.input`
   font-size: 14px;
 `;
 
+const bounce = keyframes`
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+`;
+
 const Button = styled.button`
   width: 100%;
   padding: 10px;
@@ -68,62 +80,72 @@ const Button = styled.button`
   font-size: 16px;
   cursor: pointer;
   margin-top: 10px;
-`;
+  animation: ${bounce} 1s infinite;
 
-const RememberMe = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  font-size: 14px;
-`;
-
-const SignupLink = styled.div`
-  margin-top: 20px;
-  font-size: 14px;
-
-  a {
-    color: #3498db;
-    text-decoration: none;
+  &:hover {
+    background-color: #218838;
   }
 `;
 
 const Login = ({ setLoggedIn }) => {
   const navigate = useNavigate();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    setLoggedIn(true);
-    navigate('/dashboard'); 
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post('https://parkspotter-backened.onrender.com/accounts/user_login/', {
+        login: username,
+        password: password,
+      });
+
+      const { token, user_id, role } = response.data;
+
+      if (role === 'admin') {
+        localStorage.setItem('token', token);
+        localStorage.setItem('user_id', user_id);
+        localStorage.setItem('role', role);
+        setLoggedIn(true);
+        toast.success('Login successful!');
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 2000); 
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Login Failed',
+          text: 'Not an admin',
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Login Failed',
+        text: error.response?.data?.message || 'Wrong username or password',
+      });
+    }
   };
 
   return (
     <LoginContainer>
+      <Toaster />
       <ParticleWrapper>
         <ParticlesBg type="cobweb" bg={true} />
       </ParticleWrapper>
       <LoginForm>
         <Logo>ParkSpotter</Logo>
         <p>Admin</p>
-        <form>
+        <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }}>
           <FormGroup>
             <Label>Username</Label>
-            <Input type="text" placeholder="Enter username" />
+            <Input type="text" placeholder="Enter username" value={username} onChange={(e) => setUsername(e.target.value)} />
           </FormGroup>
           <FormGroup>
             <Label>Password</Label>
-            <Input type="password" placeholder="Enter password" />
+            <Input type="password" placeholder="Enter password" value={password} onChange={(e) => setPassword(e.target.value)} />
           </FormGroup>
-          <RememberMe>
-            <label>
-              <input type="checkbox" /> Remember me
-            </label>
-            <Link to={"#"}>Forgot password?</Link>
-          </RememberMe>
-          <Button type="button" onClick={handleLogin}>Sign In</Button>
+          <Button type="submit">Sign In</Button>
         </form>
-        <SignupLink>
-          Don't have an account? <Link to={"#"}>Signup</Link>
-        </SignupLink>
       </LoginForm>
     </LoginContainer>
   );

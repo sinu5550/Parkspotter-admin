@@ -41,6 +41,8 @@ const AnalyticsContainer = styled.div`
   flex: 1;
   background-color: #f7f8fa;
   font-family: Arial, sans-serif;
+  padding: 20px;
+
 `
 
 const Header = styled.div`

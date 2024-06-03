@@ -1,21 +1,26 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
 } from "react-router-dom"
-// import Analytics from "./components/Analytics"
-// import ParkingZones from "./pages/ParkingZones"
-// import SupportTickets from "./pages/SupportTickets"
-// import AdminManagement from "./pages/AdminManagement"
 import Login from "./pages/Login"
 import Dashboard from "./pages/Dashboard"
-// import Parkowners from "./pages/Parkowners"
 
 const App = () => {
   const [collapsed, setCollapsed] = useState(false)
   const [loggedIn, setLoggedIn] = useState(false)
+  const [role, setRole] = useState(null)
+  console.log(role);
+  useEffect(() => {
+    const storedRole = localStorage.getItem("role")
+    if (storedRole) {
+      setRole(storedRole)
+      setLoggedIn(storedRole === "admin")
+    }
+  }, [])
+
   const toggleCollapse = () => {
     setCollapsed(!collapsed)
   }

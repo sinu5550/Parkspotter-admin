@@ -1,12 +1,5 @@
-import React from "react"
-import styled from "styled-components"
-import {
-  FaSearch,
-  FaFilter,
-  // FaChartLine,
-  FaUserPlus,
-  FaUserTimes,
-} from "react-icons/fa"
+import React, { useEffect, useState } from "react"
+import { FaSearch, FaFilter, FaUserPlus, FaUserTimes } from "react-icons/fa"
 import { Bar, Line, Doughnut } from "react-chartjs-2"
 import {
   Chart as ChartJS,
@@ -21,6 +14,19 @@ import {
   Legend,
   Filler,
 } from "chart.js"
+import {
+  ChartBox,
+  Charts,
+  Filters,
+  Header,
+  SearchBar,
+  StatBox,
+  Stats,
+  UsersContainer,
+  UserTable,
+  Pagination,
+  PaginationButton,
+} from "./Users.styled"
 
 ChartJS.register(
   CategoryScale,
@@ -35,179 +41,141 @@ ChartJS.register(
   Filler
 )
 
-const UsersContainer = styled.div`
-  background-color: #f7f8fa;
-  font-family: Arial, sans-serif;
-`
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-
-  h1 {
-    font-size: 24px;
-    color: #333;
-  }
-`
-
-const SearchBar = styled.div`
-  display: flex;
-  align-items: center;
-  background-color: #fff;
-  padding: 10px;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-  input {
-    border: none;
-    outline: none;
-    margin-left: 10px;
-    flex: 1;
-  }
-`
-
-const Filters = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-
-  button {
-    display: flex;
-    align-items: center;
-    background-color: #3498db;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-
-    svg {
-      margin-right: 10px;
-    }
-
-    &:hover {
-      background-color: #2980b9;
-    }
-  }
-`
-
-const Stats = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-`
-
-const StatBox = styled.div`
-  flex: 1;
-  margin-right: 20px;
-  padding: 20px;
-  background-color: white;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-  &:last-child {
-    margin-right: 0;
-  }
-
-  h2 {
-    margin: 0;
-    font-size: 16px;
-    color: #333;
-  }
-
-  p {
-    font-size: 24px;
-    margin: 10px 0;
-    color: #333;
-  }
-
-  .increase {
-    color: #27ae60;
-  }
-
-  .decrease {
-    color: #c0392b;
-  }
-`
-
-const Charts = styled.div`
-  display: flex;
-  justify-content: space-between;
-`
-
-const ChartBox = styled.div`
-  flex: 1;
-  margin-right: 20px;
-  padding: 20px;
-  background-color: white;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-  &:last-child {
-    margin-right: 0;
-  }
-
-  h3 {
-    margin: 0 0 10px 0;
-    font-size: 18px;
-    color: #333;
-  }
-`
-
-const userGrowthData = {
-  labels: ["January", "February", "March", "April", "May", "June"],
-  datasets: [
-    {
-      label: "New Users",
-      data: [30, 45, 28, 80, 99, 120],
-      backgroundColor: "#3498db",
-      borderColor: "#3498db",
-      fill: true,
-    },
-  ],
-}
-
-const userStatusData = {
-  labels: ["Active", "Inactive", "Banned"],
-  datasets: [
-    {
-      data: [300, 50, 20],
-      backgroundColor: ["#2ecc71", "#e74c3c", "#95a5a6"],
-    },
-  ],
-}
-
-const userActivityData = {
-  labels: [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
-  ],
-  datasets: [
-    {
-      label: "User Activity",
-      data: [50, 40, 60, 70, 50, 30, 40],
-      backgroundColor: "#e67e22",
-      borderColor: "#e67e22",
-      fill: true,
-    },
-  ],
-}
-
 const Users = () => {
+  const [users, setUsers] = useState([])
+  const [search, setSearch] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
+  const usersPerPage = 5
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch(
+          "https://parkspotter-backened.onrender.com/customer/customer-list/"
+        )
+        const data = await response.json()
+        setUsers(data)
+      } catch (error) {
+        console.error("Error fetching users:", error)
+      }
+    }
+
+    fetchUsers()
+  }, [])
+
+  const handleSearchChange = (event) => {
+    setSearch(event.target.value)
+  }
+
+  const filteredUsers = users.filter((user) =>
+    user.customer_id.username.toLowerCase().includes(search.toLowerCase())
+  )
+
+  const handleRemoveUser = (userId) => {
+    setUsers(users.filter((user) => user.id !== userId))
+  }
+
+  const indexOfLastUser = currentPage * usersPerPage
+  const indexOfFirstUser = indexOfLastUser - usersPerPage
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser)
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber)
+
+  const totalUsers = users.length
+  const activeUsers = users.filter((user) => user.points > 0).length
+  const inactiveUsers = totalUsers - activeUsers
+  const bannedUsers = users.filter((user) => user.points < 0).length
+
+  const userGrowthData = {
+    labels: [],
+    datasets: [
+      {
+        label: "New Users",
+        data: [],
+        backgroundColor: "#3498db",
+        borderColor: "#3498db",
+        fill: true,
+      },
+    ],
+  }
+
+  const monthMap = {
+    0: "January",
+    1: "February",
+    2: "March",
+    3: "April",
+    4: "May",
+    5: "June",
+    6: "July",
+    7: "August",
+    8: "September",
+    9: "October",
+    10: "November",
+    11: "December",
+  }
+
+  const userCountByMonth = new Array(12).fill(0)
+
+  users.forEach((user) => {
+    const joinedDate = new Date(user.joined_date)
+    const month = joinedDate.getMonth()
+    userCountByMonth[month] += 1
+  })
+
+  userGrowthData.labels = Object.values(monthMap)
+  userGrowthData.datasets[0].data = userCountByMonth
+
+  const userStatusData = {
+    labels: ["Active", "Inactive", "Banned"],
+    datasets: [
+      {
+        data: [activeUsers, inactiveUsers, bannedUsers],
+        backgroundColor: ["#2ecc71", "#e74c3c", "#95a5a6"],
+      },
+    ],
+  }
+
+  const userActivityData = {
+    labels: [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday",
+    ],
+    datasets: [
+      {
+        label: "User Activity",
+        data: new Array(7).fill(0),
+        backgroundColor: "#e67e22",
+        borderColor: "#e67e22",
+        fill: true,
+        pointRadius: 5,
+        pointHoverRadius: 8,
+      },
+    ],
+  }
+
+  users.forEach((user) => {
+    const joinedDate = new Date(user.joined_date)
+    const dayOfWeek = joinedDate.getDay()
+    userActivityData.datasets[0].data[dayOfWeek] += user.points
+  })
+
   return (
     <UsersContainer>
       <Header>
         <h1>Users</h1>
         <SearchBar>
           <FaSearch />
-          <input type="text" placeholder="Search users..." />
+          <input
+            type="text"
+            placeholder="Search users..."
+            value={search}
+            onChange={handleSearchChange}
+          />
         </SearchBar>
       </Header>
       <Filters>
@@ -227,32 +195,77 @@ const Users = () => {
       <Stats>
         <StatBox>
           <h2>Total Users</h2>
-          <p>370</p>
+          <p>{totalUsers}</p>
         </StatBox>
         <StatBox>
           <h2>Active Users</h2>
-          <p className="increase">300</p>
+          <p className="increase">{activeUsers}</p>
         </StatBox>
         <StatBox>
           <h2>Inactive Users</h2>
-          <p className="decrease">50</p>
+          <p className="decrease">{inactiveUsers}</p>
         </StatBox>
         <StatBox>
           <h2>Banned Users</h2>
-          <p className="decrease">20</p>
+          <p className="decrease">{bannedUsers}</p>
         </StatBox>
       </Stats>
+      <UserTable>
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Mobile</th>
+            <th>Vehicle Brand</th>
+            <th>Plate Number</th>
+            <th>Joined Date</th>
+            <th>Points</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {currentUsers.map((user) => (
+            <tr key={user.id}>
+              <td>{user.customer_id.username}</td>
+              <td>{user.customer_id.email}</td>
+              <td>{user.customer_id.first_name}</td>
+              <td>{user.customer_id.last_name}</td>
+              <td>{user.mobile_no}</td>
+              <td>{user.vehicle_brand}</td>
+              <td>{user.plate_number}</td>
+              <td>{new Date(user.joined_date).toLocaleDateString()}</td>
+              <td>{user.points}</td>
+              <td>
+                <button onClick={() => handleRemoveUser(user.id)}>
+                  <FaUserTimes />
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </UserTable>
+      <Pagination>
+        {Array.from({
+          length: Math.ceil(filteredUsers.length / usersPerPage),
+        }).map((_, index) => (
+          <PaginationButton key={index} onClick={() => paginate(index + 1)}>
+            {index + 1}
+          </PaginationButton>
+        ))}
+      </Pagination>
       <Charts>
-        <ChartBox>
+        <ChartBox type="1st">
           <h3>User Growth</h3>
           <Line data={userGrowthData} />
         </ChartBox>
-        <ChartBox>
+        <ChartBox type="2nd">
           <h3>User Status</h3>
           <Doughnut data={userStatusData} />
         </ChartBox>
       </Charts>
-      <ChartBox>
+      <ChartBox type="3rd">
         <h3>Weekly Activity</h3>
         <Bar data={userActivityData} />
       </ChartBox>

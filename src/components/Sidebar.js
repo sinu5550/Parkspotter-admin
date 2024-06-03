@@ -7,8 +7,8 @@ import {
   FaTh, 
   FaCalendarAlt, 
   FaMapMarkedAlt, 
-  FaTicketAlt, 
-  FaUserShield, 
+  // FaTicketAlt, 
+  // FaUserShield, 
   FaFileInvoiceDollar,
   FaChevronDown,
 } from 'react-icons/fa';
@@ -162,18 +162,18 @@ const Sidebar = ({ collapsed, toggleCollapse }) => {
               {!collapsed && 'Parking Zones'}
             </MenuLink>
           </li>
-          <li>
+          {/* <li>
             <MenuLink to="/dashboard/support-tickets">
               <FaTicketAlt />
               {!collapsed && 'Support Tickets'}
             </MenuLink>
-          </li>
-          <li>
+          </li> */}
+          {/* <li>
             <MenuLink to="/dashboard/admin-management">
               <FaUserShield />
               {!collapsed && 'Admin Management'}
             </MenuLink>
-          </li>
+          </li> */}
         </ul>
       </Menu>
     </SidebarContainer>
