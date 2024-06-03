@@ -153,10 +153,11 @@ const Overview = () => {
       } catch (error) {
         console.error("Error fetching data:", error)
       }
-    }
+
+    };
 
     fetchData()
-  }, [])
+  }, []);
 
   const countTotalBookings = (data) => {
     let totalBookingCount = 0
