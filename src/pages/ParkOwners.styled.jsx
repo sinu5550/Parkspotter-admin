@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import Modal from "react-modal";
 
 export const ParkownersContainer = styled.div`
   background-color: #f8f9fa;
@@ -104,5 +105,36 @@ export const ParkownerItem = styled.li`
         color: #3498db;
       }
     }
+  }
+`;
+
+export const StyledModal = styled(Modal)`
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 50px auto;
+
+  h2 {
+    margin-top: 0;
+  }
+
+  .ant-form-item {
+    margin-bottom: 16px;
+  }
+
+  .ant-btn-primary {
+    background-color: #3498db;
+    border-color: #3498db;
+
+    &:hover {
+      background-color: #2980b9;
+      border-color: #2980b9;
+    }
+  }
+
+  .ant-btn {
+    margin-right: 10px;
   }
 `;

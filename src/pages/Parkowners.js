@@ -8,7 +8,8 @@ import {
   FaEye,
 } from "react-icons/fa";
 import Modal from "react-modal";
-import { Button, Form, Input, Pagination, Tooltip } from "antd";
+import { Button, Form, Input, Pagination, Tooltip, Select, DatePicker } from "antd";
+import moment from "moment";
 import { Bar } from "react-chartjs-2";
 import {
   Filters,
@@ -18,9 +19,12 @@ import {
   ParkownersList,
   SearchBar,
   Title,
+  StyledModal,
 } from "./ParkOwners.styled";
 
-Modal.setAppElement('#root'); // to remove accessibility-related warnings
+Modal.setAppElement("#root"); // to remove accessibility-related warnings
+
+const { Option } = Select;
 
 const Parkowners = () => {
   const [parkowners, setParkowners] = useState([]);
@@ -32,10 +36,14 @@ const Parkowners = () => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [selectedParkowner, setSelectedParkowner] = useState(null);
   const [newParkowner, setNewParkowner] = useState({
-    name: "",
-    contact: "",
-    parksOwned: 0,
-    revenue: 0,
+    zones: "",
+    isActive: true,
+    username: "",
+    email: "",
+    phone: "",
+    password: "",
+    subscription: "",
+    subscriptionEndDate: null,
   });
   const itemsPerPage = 3;
 
@@ -95,7 +103,16 @@ const Parkowners = () => {
       { ...newParkowner, park_owner_id: parkowners.length + 1 },
     ]);
     setIsAddModalVisible(false);
-    setNewParkowner({ name: "", contact: "", parksOwned: 0, revenue: 0 });
+    setNewParkowner({
+      zones: "",
+      isActive: true,
+      username: "",
+      email: "",
+      phone: "",
+      password: "",
+      subscription: "",
+      subscriptionEndDate: null,
+    });
   };
 
   const handleDelete = (id) => {
@@ -190,50 +207,79 @@ const Parkowners = () => {
         onChange={(page) => setPage(page)}
       />
       <Bar data={revenueData} options={{ responsive: true }} />
-      <Modal
+      <StyledModal
         isOpen={isAddModalVisible}
         onRequestClose={() => setIsAddModalVisible(false)}
         contentLabel="Add Parkowner"
       >
         <h2>Add Parkowner</h2>
         <Form layout="vertical">
-          <Form.Item label="Name" name="name">
+          <Form.Item label="Zones" name="zones">
             <Input
-              value={newParkowner.name}
+              value={newParkowner.zones}
               onChange={(e) =>
-                setNewParkowner({ ...newParkowner, name: e.target.value })
+                setNewParkowner({ ...newParkowner, zones: e.target.value })
               }
             />
           </Form.Item>
-          <Form.Item label="Contact" name="contact">
+          <Form.Item label="Active/Deactive" name="isActive">
+            <Select
+              value={newParkowner.isActive}
+              onChange={(value) =>
+                setNewParkowner({ ...newParkowner, isActive: value })
+              }
+            >
+              <Option value={true}>Active</Option>
+              <Option value={false}>Deactive</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item label="Username" name="username">
             <Input
-              value={newParkowner.contact}
+              value={newParkowner.username}
               onChange={(e) =>
-                setNewParkowner({ ...newParkowner, contact: e.target.value })
+                setNewParkowner({ ...newParkowner, username: e.target.value })
               }
             />
           </Form.Item>
-          <Form.Item label="Parks Owned" name="parksOwned">
+          <Form.Item label="Email" name="email">
             <Input
-              type="number"
-              value={newParkowner.parksOwned}
+              type="email"
+              value={newParkowner.email}
               onChange={(e) =>
-                setNewParkowner({
-                  ...newParkowner,
-                  parksOwned: parseInt(e.target.value),
-                })
+                setNewParkowner({ ...newParkowner, email: e.target.value })
               }
             />
           </Form.Item>
-          <Form.Item label="Revenue" name="revenue">
+          <Form.Item label="Phone" name="phone">
             <Input
-              type="number"
-              value={newParkowner.revenue}
+              value={newParkowner.phone}
               onChange={(e) =>
-                setNewParkowner({
-                  ...newParkowner,
-                  revenue: parseFloat(e.target.value),
-                })
+                setNewParkowner({ ...newParkowner, phone: e.target.value })
+              }
+            />
+          </Form.Item>
+          <Form.Item label="Password" name="password">
+            <Input
+              type="password"
+              value={newParkowner.password}
+              onChange={(e) =>
+                setNewParkowner({ ...newParkowner, password: e.target.value })
+              }
+            />
+          </Form.Item>
+          <Form.Item label="Subscription" name="subscription">
+            <Input
+              value={newParkowner.subscription}
+              onChange={(e) =>
+                setNewParkowner({ ...newParkowner, subscription: e.target.value })
+              }
+            />
+          </Form.Item>
+          <Form.Item label="Subscription End Date" name="subscriptionEndDate">
+            <DatePicker
+              value={newParkowner.subscriptionEndDate}
+              onChange={(date) =>
+                setNewParkowner({ ...newParkowner, subscriptionEndDate: date })
               }
             />
           </Form.Item>
@@ -242,8 +288,8 @@ const Parkowners = () => {
           </Button>
           <Button onClick={() => setIsAddModalVisible(false)}>Cancel</Button>
         </Form>
-      </Modal>
-      <Modal
+      </StyledModal>
+      <StyledModal
         isOpen={isEditModalVisible}
         onRequestClose={() => setIsEditModalVisible(false)}
         contentLabel="Edit Parkowner"
@@ -252,50 +298,76 @@ const Parkowners = () => {
         {selectedParkowner && (
           <Form
             layout="vertical"
-            initialValues={selectedParkowner}
+            initialValues={{
+              zones: selectedParkowner.zones,
+              isActive: selectedParkowner.isActive,
+              username: selectedParkowner.username,
+              email: selectedParkowner.email,
+              phone: selectedParkowner.phone,
+              password: selectedParkowner.password,
+              subscription: selectedParkowner.subscription.package,
+              subscriptionEndDate: moment(selectedParkowner.subscription_end_date),
+            }}
             onFinish={handleEditSubmit}
           >
-            <Form.Item label="Name" name="name">
+            <Form.Item label="Zones" name="zones">
               <Input />
             </Form.Item>
-            <Form.Item label="Contact" name="contact">
+            <Form.Item label="Active/Deactive" name="isActive">
+              <Select>
+                <Option value={true}>Active</Option>
+                <Option value={false}>Deactive</Option>
+              </Select>
+            </Form.Item>
+            <Form.Item label="Username" name="username">
               <Input />
             </Form.Item>
-            <Form.Item label="Parks Owned" name="parksOwned">
-              <Input type="number" />
+            <Form.Item label="Email" name="email">
+              <Input type="email" />
             </Form.Item>
-            <Form.Item label="Revenue" name="revenue">
-              <Input type="number" />
+            <Form.Item label="Phone" name="phone">
+              <Input />
+            </Form.Item>
+            <Form.Item label="Password" name="password">
+              <Input type="password" />
+            </Form.Item>
+            <Form.Item label="Subscription" name="subscription">
+              <Input />
+            </Form.Item>
+            <Form.Item label="Subscription End Date" name="subscriptionEndDate">
+              <DatePicker />
             </Form.Item>
             <Button type="primary" htmlType="submit">
-              Save
+              Submit
             </Button>
             <Button onClick={() => setIsEditModalVisible(false)}>Cancel</Button>
           </Form>
         )}
-      </Modal>
-      <Modal
+      </StyledModal>
+      <StyledModal
         isOpen={isDetailsModalVisible}
         onRequestClose={() => setIsDetailsModalVisible(false)}
         contentLabel="Parkowner Details"
       >
-        <h2>Parkowner Details</h2>
         {selectedParkowner && (
           <div>
+            <h2>Parkowner Details</h2>
+            <p>Zones: {selectedParkowner.zones}</p>
+            <p>Active/Deactive: {selectedParkowner.isActive ? "Active" : "Deactive"}</p>
             <p>Username: {selectedParkowner.username}</p>
+            <p>Email: {selectedParkowner.email}</p>
+            <p>Phone: {selectedParkowner.phone}</p>
+            <p>Subscription: {selectedParkowner.subscription.package}</p>
+            <p>Subscription End Date: {moment(selectedParkowner.subscription_end_date).format("YYYY-MM-DD")}</p>
             <p>Total Earnings: ${selectedParkowner.total_earnings.toFixed(2)}</p>
             <p>Total Salary Cost: ${selectedParkowner.total_salary_cost.toFixed(2)}</p>
             <p>Net Revenue: ${selectedParkowner.park_owner_net_revenue.toFixed(2)}</p>
-            <p>
-              Subscription Package: {selectedParkowner.subscription.package}
-            </p>
           </div>
         )}
         <Button onClick={() => setIsDetailsModalVisible(false)}>Close</Button>
-      </Modal>
+      </StyledModal>
     </ParkownersContainer>
   );
 };
 
 export default Parkowners;
-// original
