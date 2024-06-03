@@ -12,7 +12,7 @@ const App = () => {
   const [collapsed, setCollapsed] = useState(false)
   const [loggedIn, setLoggedIn] = useState(false)
   const [role, setRole] = useState(null)
-
+  console.log(role);
   useEffect(() => {
     const storedRole = localStorage.getItem("role")
     if (storedRole) {

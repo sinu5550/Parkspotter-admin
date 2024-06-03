@@ -7,8 +7,8 @@ import {
   FaTh, 
   FaCalendarAlt, 
   FaMapMarkedAlt, 
-  FaTicketAlt, 
-  FaUserShield, 
+  // FaTicketAlt, 
+  // FaUserShield, 
   FaFileInvoiceDollar,
   FaChevronDown,
 } from 'react-icons/fa';

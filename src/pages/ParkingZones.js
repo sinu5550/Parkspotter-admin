@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
 import mapboxgl from 'mapbox-gl';
 import axios from 'axios';
 import { Container, MapContainer, ParkOwner, SearchBox, SidePanel } from './ParkingZones.styled';
