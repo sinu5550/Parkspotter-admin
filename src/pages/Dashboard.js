@@ -28,7 +28,7 @@ const MainContent = styled.div`
 `
 
 const ContentWrapper = styled.div`
-  padding: 20px;
+  // padding: 20px;
 `
 
 const Dashboard = ({ collapsed, toggleCollapse }) => {
@@ -42,8 +42,8 @@ const Dashboard = ({ collapsed, toggleCollapse }) => {
             <Route path="/" element={<Overview />} />
             <Route path="analytics" element={<Analytics />} />
             <Route path="parking-zones" element={<ParkingZones />} />
-            <Route path="support-tickets" element={<SupportTickets />} />
-            <Route path="admin-management" element={<AdminManagement />} />
+            {/* <Route path="support-tickets" element={<SupportTickets />} /> */}
+            {/* <Route path="admin-management" element={<AdminManagement />} /> */}
             <Route path="bookings" element={<Bookings />} />
             <Route path="subscriptions" element={<ViewSubscriptions />} />
             <Route path="parkowners" element={<Parkowners />} />

@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { FaSearch, FaBell, FaUserCircle, FaRegFlag, FaSignOutAlt, FaCog } from 'react-icons/fa';
 import { Dropdown, Menu, Input, Modal, Button, List, Tabs, Form, Switch } from 'antd';
+import { useNavigate } from 'react-router-dom';
 
 const { TabPane } = Tabs;
 
@@ -29,6 +30,25 @@ const SearchBar = styled.div`
     margin-left: 10px;
     outline: none;
     width: 100%;
+  }
+`;
+
+const SuggestionsList = styled.div`
+  background: white;
+  border: 1px solid #ddd;
+  position: absolute;
+  top: 45px;
+  width: 300px;
+  z-index: 2;
+  max-height: 200px;
+  overflow-y: auto;
+
+  div {
+    padding: 10px;
+    cursor: pointer;
+    &:hover {
+      background: #eee;
+    }
   }
 `;
 
@@ -105,15 +125,74 @@ const settingsData = [
   { label: 'Dark mode', value: false },
 ];
 
+const searchOptions = [
+  { label: 'Overview', path: '/dashboard' },
+  { label: 'Analytics', path: '/dashboard/analytics' },
+  { label: 'Parking Zones', path: '/dashboard/parking-zones' },
+  { label: 'View Subscriptions', path: '/dashboard/subscriptions' },
+  { label: 'Bookings', path: '/dashboard/bookings' },
+  { label: 'Parkowners', path: '/dashboard/parkowners' },
+  { label: 'Users', path: '/dashboard/users' },
+  { label: 'Zones', path: '/dashboard/zones' },
+  // Add more options as needed
+];
+
 const Navbar = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isProfileModalVisible, setIsProfileModalVisible] = useState(false);
   const [isReportsModalVisible, setIsReportsModalVisible] = useState(false);
   const [isNotificationsModalVisible, setIsNotificationsModalVisible] = useState(false);
   const [isSettingsModalVisible, setIsSettingsModalVisible] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const [username, setUsername] = useState('');
+  const [role, setRole] = useState('');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const token = localStorage.getItem('token');
+      const role = localStorage.getItem('role');
+      setRole(role);
+
+      try {
+        const response = await fetch('https://parkspotter-backened.onrender.com/accounts/admin_dashboard/', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const data = await response.json();
+
+        if (data.park_owners_with_subscription.length > 0) {
+          setUsername(data.park_owners_with_subscription[0].username);
+        } else {
+          setUsername('Admin');
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        setUsername('Admin');
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
+    const term = e.target.value;
+    setSearchTerm(term);
+    if (term) {
+      const filteredSuggestions = searchOptions.filter(option =>
+        option.label.toLowerCase().includes(term.toLowerCase())
+      );
+      setSuggestions(filteredSuggestions);
+    } else {
+      setSuggestions([]);
+    }
+  };
+
+  const handleSuggestionClick = (path) => {
+    navigate(path);
+    setSearchTerm('');
+    setSuggestions([]);
   };
 
   const profileMenu = (
@@ -142,10 +221,19 @@ const Navbar = () => {
       <SearchBar>
         <FaSearch />
         <Input
-          placeholder="Search parkowners or users..."
+          placeholder="Search for Menus & Sub-Menus..."
           value={searchTerm}
           onChange={handleSearchChange}
         />
+        {suggestions.length > 0 && (
+          <SuggestionsList>
+            {suggestions.map((suggestion, index) => (
+              <div key={index} onClick={() => handleSuggestionClick(suggestion.path)}>
+                {suggestion.label}
+              </div>
+            ))}
+          </SuggestionsList>
+        )}
       </SearchBar>
       <NavIcons>
         <FaRegFlag title="Reports" onClick={() => setIsReportsModalVisible(true)} />
@@ -154,14 +242,13 @@ const Navbar = () => {
           <Profile>
             <img src="https://icon-library.com/images/generic-user-icon/generic-user-icon-9.jpg" alt="Profile" />
             <div>
-              <span>Admin Name</span>
-              <small>Admin Role</small>
+              <span>{username}</span>
+              <small>{role}</small>
             </div>
           </Profile>
         </Dropdown>
       </NavIcons>
 
-      
       <Modal
         title="User Profile"
         visible={isProfileModalVisible}
@@ -172,14 +259,13 @@ const Navbar = () => {
       >
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <img src="https://via.placeholder.com/100" alt="Profile" style={{ borderRadius: '50%', marginBottom: '20px' }} />
-          <h2>Admin Name</h2>
-          <p><strong>Role:</strong> Admin Role</p>
+          <h2>{username}</h2>
+          <p><strong>Role:</strong> {role}</p>
           <p><strong>Email:</strong> admin@example.com</p>
           <p><strong>Joined:</strong> January 1, 2020</p>
         </div>
       </Modal>
 
-      
       <Modal
         title="Reports"
         visible={isReportsModalVisible}
@@ -208,9 +294,9 @@ const Navbar = () => {
       >
         <List
           dataSource={notifications}
-          renderItem={(notif) => (
+          renderItem={(notification) => (
             <List.Item>
-              <List.Item.Meta title={notif} />
+              <List.Item.Meta title={notification} />
             </List.Item>
           )}
         />
@@ -221,13 +307,12 @@ const Navbar = () => {
         visible={isSettingsModalVisible}
         onCancel={() => setIsSettingsModalVisible(false)}
         footer={[
-          <Button key="save" type="primary" onClick={() => setIsSettingsModalVisible(false)}>Save</Button>,
-          <Button key="cancel" onClick={() => setIsSettingsModalVisible(false)}>Cancel</Button>,
+          <Button key="close" onClick={() => setIsSettingsModalVisible(false)}>Close</Button>,
         ]}
       >
         <Tabs defaultActiveKey="1">
           <TabPane tab="General" key="1">
-            <Form>
+            <Form layout="vertical">
               {settingsData.map((setting, index) => (
                 <Form.Item key={index} label={setting.label}>
                   <Switch defaultChecked={setting.value} />
@@ -235,15 +320,11 @@ const Navbar = () => {
               ))}
             </Form>
           </TabPane>
-          <TabPane tab="Privacy" key="2">
-            <Form>
-              <Form.Item label="Allow data collection">
-                <Switch defaultChecked />
-              </Form.Item>
-              <Form.Item label="Enable two-factor authentication">
-                <Switch />
-              </Form.Item>
-            </Form>
+          <TabPane tab="Security" key="2">
+            {/* Add security settings form items here */}
+          </TabPane>
+          <TabPane tab="Notifications" key="3">
+            {/* Add notifications settings form items here */}
           </TabPane>
         </Tabs>
       </Modal>

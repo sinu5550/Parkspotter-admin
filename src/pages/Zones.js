@@ -32,6 +32,8 @@ ChartJS.register(
 const ZonesContainer = styled.div`
   background-color: #f7f8fa;
   font-family: Arial, sans-serif;
+  padding: 20px;
+
 `
 
 const Header = styled.div`

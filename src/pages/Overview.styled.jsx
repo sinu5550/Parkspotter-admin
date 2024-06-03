@@ -4,7 +4,9 @@ export const OverviewContainer = styled.div`
   background-color: #f7f8fa;
   color: #333;
   font-family: Arial, sans-serif;
-`
+  padding: 20px;
+
+  `
 
 export const Greeting = styled.div`
   margin-bottom: 20px;
