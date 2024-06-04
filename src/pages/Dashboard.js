@@ -13,6 +13,7 @@ import Parkowners from "./Parkowners"
 import Users from "./Users"
 import Zones from "./Zones"
 import Bookings from "./Bookings"
+import ManagePlans from "./ManagePlans"
 
 
 const DashboardContainer = styled.div`
@@ -49,6 +50,7 @@ const Dashboard = ({ collapsed, toggleCollapse }) => {
             <Route path="parkowners" element={<Parkowners />} />
             <Route path="users" element={<Users />} />
             <Route path="zones" element={<Zones />} />
+            <Route path="manage-plans" element={<ManagePlans />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
           <Outlet />
