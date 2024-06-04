@@ -107,7 +107,7 @@ const SubmitButton = styled.button`
 `
 
 const ManagePlans = () => {
-  const navigate = useNavigate()
+  // const navigate = useNavigate()
   const [subscriptions, setSubscriptions] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [formValues, setFormValues] = useState({
