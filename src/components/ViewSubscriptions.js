@@ -66,7 +66,7 @@ const ViewSubscriptions = () => {
     const fetchSubscriptions = async () => {
       try {
         const response = await fetch(
-          "https://parkspotter-backened.onrender.com/accounts/subscription/"
+          "https://parkspotter-backened.onrender.com/accounts/subscription_package/"
         )
         if (!response.ok) throw new Error("Failed to fetch subscriptions")
         const data = await response.json()
@@ -283,3 +283,4 @@ const ViewSubscriptions = () => {
 }
 
 export default ViewSubscriptions
+// original
