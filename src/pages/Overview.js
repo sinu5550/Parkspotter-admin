@@ -274,58 +274,59 @@ const Overview = () => {
         </RevenueStats>
       </RevenueSection>
       <SalesLocations>
-        <h2>Sales by Locations</h2>
-        <Map
-          initialViewState={{
-            latitude: 23.813334,
-            longitude: 90.424164,
-            zoom: 7.5,
-          }}
-          style={{ width: "100%", height: 400 }}
-          mapStyle="mapbox://styles/mapbox/streets-v11"
-          mapboxAccessToken={MAPBOX_TOKEN}
-        >
-          {parkOwnerData &&
-            parkOwnerData.map((owner) => (
-              <Marker
-                key={owner.id}
-                latitude={parseFloat(owner.latitude)}
-                longitude={parseFloat(owner.longitude)}
-              >
-                <div
-                  style={{
-                    backgroundColor:
-                      owner.area === maxDivision ? "red" : "lightblue",
-                    width: "20px",
-                    height: "20px",
-                    borderRadius: "50%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <div
-                    style={{
-                      backgroundColor: "white",
-                      width: "10px",
-                      height: "10px",
-                      borderRadius: "50%",
-                    }}
-                  ></div>
-                </div>
-              </Marker>
-            ))}
-        </Map>
-        <ul>
-          {Object.entries(divisionRatios).map(([division, ratio]) => (
-            <li key={division}>
-              <span style={{ fontWeight: "bold" }}>{division}</span>
-              <span>{ratio}%</span>
-            </li>
-          ))}
-        </ul>
-        <button>Export Report</button>
-      </SalesLocations>
+  <h2>Sales by Locations</h2>
+  <Map
+    initialViewState={{
+      latitude: 23.813334,
+      longitude: 90.424164,
+      zoom: 7.5,
+    }}
+    style={{ width: "100%", height: 400 }}
+    mapStyle="mapbox://styles/mapbox/streets-v11"
+    mapboxAccessToken={MAPBOX_TOKEN}
+  >
+    {parkOwnerData &&
+      parkOwnerData
+        .filter(owner => owner.latitude && owner.longitude) 
+        .map(owner => (
+          <Marker
+            key={owner.id}
+            latitude={parseFloat(owner.latitude)}
+            longitude={parseFloat(owner.longitude)}
+          >
+            <div
+              style={{
+                backgroundColor: owner.area === maxDivision ? "red" : "lightblue",
+                width: "20px",
+                height: "20px",
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <div
+                style={{
+                  backgroundColor: "white",
+                  width: "10px",
+                  height: "10px",
+                  borderRadius: "50%",
+                }}
+              ></div>
+            </div>
+          </Marker>
+        ))}
+  </Map>
+  <ul>
+    {Object.entries(divisionRatios).map(([division, ratio]) => (
+      <li key={division}>
+        <span style={{ fontWeight: "bold" }}>{division}</span>
+        <span>{ratio}%</span>
+      </li>
+    ))}
+  </ul>
+  <button>Export Report</button>
+</SalesLocations>
       <div>
         <h2>Monthly Earnings</h2>
         <Bar data={chartData} />

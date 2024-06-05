@@ -5,7 +5,13 @@ import { Container, MapContainer, ParkOwner, SearchBox, SidePanel } from './Park
 
 mapboxgl.accessToken = 'pk.eyJ1IjoibW93dWoiLCJhIjoiY2x3ZHJjcWs4MDRrMjJqcXBmZnIwMHpvNCJ9.YGSlU2XkHa7quHa1Mnd2Pg';
 
+const isValidCoordinate = (coord) => coord !== null && typeof coord === 'number' && !isNaN(coord);
 
+const parseCoordinate = (coord) => {
+  if (coord === null) return null;
+  const parsed = parseFloat(coord);
+  return isNaN(parsed) ? null : parsed;
+};
 
 const ParkingZones = () => {
   const [parkOwners, setParkOwners] = useState([]);
@@ -16,8 +22,13 @@ const ParkingZones = () => {
     const fetchParkOwners = async () => {
       try {
         const response = await axios.get('https://parkspotter-backened.onrender.com/accounts/parkowner-list/');
-        setParkOwners(response.data);
-        setFilteredParkOwners(response.data);
+        const data = response.data.map(owner => ({
+          ...owner,
+          latitude: parseCoordinate(owner.latitude),
+          longitude: parseCoordinate(owner.longitude)
+        }));
+        setParkOwners(data);
+        setFilteredParkOwners(data);
       } catch (error) {
         console.error('Error fetching park owners:', error);
       }
@@ -37,10 +48,14 @@ const ParkingZones = () => {
         });
 
         parkOwners.forEach(owner => {
-          new mapboxgl.Marker()
-            .setLngLat([owner.longitude, owner.latitude])
-            .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(`${owner.park_owner_id.first_name} ${owner.park_owner_id.last_name}`))
-            .addTo(map);
+          if (isValidCoordinate(owner.longitude) && isValidCoordinate(owner.latitude)) {
+            new mapboxgl.Marker()
+              .setLngLat([owner.longitude, owner.latitude])
+              .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(`${owner.park_owner_id.first_name} ${owner.park_owner_id.last_name}`))
+              .addTo(map);
+          } else {
+            console.warn('Invalid coordinates for owner:', owner);
+          }
         });
 
         setMap(map);
@@ -61,7 +76,7 @@ const ParkingZones = () => {
   };
 
   const handleParkOwnerClick = (longitude, latitude) => {
-    if (map) {
+    if (map && isValidCoordinate(longitude) && isValidCoordinate(latitude)) {
       map.flyTo({
         center: [longitude, latitude],
         zoom: 15,
