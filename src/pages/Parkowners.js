@@ -2,10 +2,11 @@ import React, { useState, useEffect } from "react";
 import {
   FaSearch,
   FaPlusCircle,
-  FaTrashAlt,
   FaSort,
   FaEdit,
   FaEye,
+  FaCheck,
+  FaTimes,
 } from "react-icons/fa";
 import Modal from "react-modal";
 import { Button, Form, Input, Pagination, Tooltip, Select, DatePicker } from "antd";
@@ -34,10 +35,11 @@ const Parkowners = () => {
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isDetailsModalVisible, setIsDetailsModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [isActivationModalVisible, setIsActivationModalVisible] = useState(false);
   const [selectedParkowner, setSelectedParkowner] = useState(null);
   const [newParkowner, setNewParkowner] = useState({
     zones: "",
-    isActive: true,
+    is_active: true,
     username: "",
     email: "",
     phone: "",
@@ -86,26 +88,20 @@ const Parkowners = () => {
     setIsEditModalVisible(true);
   };
 
+  const showActivationModal = (owner) => {
+    setSelectedParkowner(owner);
+    setIsActivationModalVisible(true);
+  };
+
   const handleEditSubmit = (values) => {
-    setParkowners(
-      parkowners.map((owner) =>
-        owner.park_owner_id === selectedParkowner.park_owner_id
-          ? { ...selectedParkowner, ...values }
-          : owner
-      )
-    );
     setIsEditModalVisible(false);
   };
 
   const handleAddSubmit = () => {
-    setParkowners([
-      ...parkowners,
-      { ...newParkowner, park_owner_id: parkowners.length + 1 },
-    ]);
     setIsAddModalVisible(false);
     setNewParkowner({
       zones: "",
-      isActive: true,
+      is_active: true,
       username: "",
       email: "",
       phone: "",
@@ -115,18 +111,74 @@ const Parkowners = () => {
     });
   };
 
-  const handleDelete = (id) => {
-    setParkowners(parkowners.filter((owner) => owner.park_owner_id !== id));
+  const handleActivate = async () => {
+    console.log("Activating park owner:", selectedParkowner);
+    try {
+      await fetch(
+        `https://parkspotter-backened.onrender.com/accounts/user_activation/${selectedParkowner.park_owner_id}/activate/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Token ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            user_type: "park_owner",
+          }),
+        }
+      );
+      const updatedParkowners = parkowners.map(owner => {
+        if (owner.park_owner_id === selectedParkowner.park_owner_id) {
+          return { ...owner, is_active: true };
+        } else {
+          return owner;
+        }
+      });
+      setParkowners(updatedParkowners);
+
+    } catch (error) {
+      console.error("Error activating parkowner:", error);
+    }
+    setIsActivationModalVisible(false);
+  };
+
+  const handleDeactivate = async () => {
+    try {
+      await fetch(
+        `https://parkspotter-backened.onrender.com/accounts/user_activation/${selectedParkowner.park_owner_id}/deactivate/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Token ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            user_type: "park_owner",
+          }),
+        }
+      );
+      const updatedParkowners = parkowners.map(owner => {
+        if (owner.park_owner_id === selectedParkowner.park_owner_id) {
+          return { ...owner, is_active: false };
+        } else {
+          return owner;
+        }
+      });
+      setParkowners(updatedParkowners);
+    } catch (error) {
+      console.error("Error deactivating parkowner:", error);
+    }
+    setIsActivationModalVisible(false);
   };
 
   const filteredParkowners = parkowners
     ? parkowners
-        .filter((owner) =>
-          owner.username.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-        .sort((a, b) =>
-          sorted ? b.total_earnings - a.total_earnings : a.park_owner_id - b.park_owner_id
-        )
+      .filter((owner) =>
+        owner.username.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      .sort((a, b) =>
+        sorted ? b.total_earnings - a.total_earnings : a.park_owner_id - b.park_owner_id
+      )
     : [];
 
   const displayedParkowners = filteredParkowners.slice(
@@ -191,9 +243,9 @@ const Parkowners = () => {
                   <FaEdit />
                 </button>
               </Tooltip>
-              <Tooltip title="Delete Parkowner">
-                <button onClick={() => handleDelete(owner.park_owner_id)}>
-                  <FaTrashAlt />
+              <Tooltip title={owner.is_active ? "Deactivate Parkowner" : "Activate Parkowner"}>
+                <button onClick={() => showActivationModal(owner)}>
+                  {owner.is_active ? <FaCheck style={{ color: "green" }} /> : <FaTimes style={{ color: "red" }} />}
                 </button>
               </Tooltip>
             </div>
@@ -222,11 +274,11 @@ const Parkowners = () => {
               }
             />
           </Form.Item>
-          <Form.Item label="Active/Deactive" name="isActive">
+          <Form.Item label="Active/Deactive" name="is_active">
             <Select
-              value={newParkowner.isActive}
+              value={newParkowner.is_active}
               onChange={(value) =>
-                setNewParkowner({ ...newParkowner, isActive: value })
+                setNewParkowner({ ...newParkowner, is_active: value })
               }
             >
               <Option value={true}>Active</Option>
@@ -277,17 +329,55 @@ const Parkowners = () => {
           </Form.Item>
           <Form.Item label="Subscription End Date" name="subscriptionEndDate">
             <DatePicker
-              value={newParkowner.subscriptionEndDate}
+              value={
+                newParkowner.subscriptionEndDate
+                  ? moment(newParkowner.subscriptionEndDate)
+                  : null
+              }
               onChange={(date) =>
-                setNewParkowner({ ...newParkowner, subscriptionEndDate: date })
+                setNewParkowner({
+                  ...newParkowner,
+                  subscriptionEndDate: date ? date.toISOString() : null,
+                })
               }
             />
           </Form.Item>
-          <Button type="primary" onClick={handleAddSubmit}>
-            Submit
-          </Button>
-          <Button onClick={() => setIsAddModalVisible(false)}>Cancel</Button>
         </Form>
+        <Button type="primary" onClick={handleAddSubmit}>
+          Add
+        </Button>
+      </StyledModal>
+      <StyledModal
+        isOpen={isDetailsModalVisible}
+        onRequestClose={() => setIsDetailsModalVisible(false)}
+        contentLabel="Parkowner Details"
+      >
+        <h2>Parkowner Details</h2>
+        {selectedParkowner && (
+          <div>
+            <p>Username: {selectedParkowner.username}</p>
+            <p>Email: {selectedParkowner.email}</p>
+            <p>Phone: {selectedParkowner.phone}</p>
+            <p>Zones: {selectedParkowner.zones}</p>
+            <p>Subscription: {selectedParkowner.subscription.package}</p>
+            <p>
+              Subscription End Date:{" "}
+              {selectedParkowner.subscriptionEndDate
+                ? moment(selectedParkowner.subscriptionEndDate).format(
+                  "MMMM Do YYYY"
+                )
+                : "N/A"}
+            </p>
+            <p>
+              Status:{" "}
+              {selectedParkowner.is_active ? (
+                <FaCheck style={{ color: "green" }} />
+              ) : (
+                <FaTimes style={{ color: "red" }} />
+              )}
+            </p>
+          </div>
+        )}
       </StyledModal>
       <StyledModal
         isOpen={isEditModalVisible}
@@ -296,29 +386,7 @@ const Parkowners = () => {
       >
         <h2>Edit Parkowner</h2>
         {selectedParkowner && (
-          <Form
-            layout="vertical"
-            initialValues={{
-              zones: selectedParkowner.zones,
-              isActive: selectedParkowner.isActive,
-              username: selectedParkowner.username,
-              email: selectedParkowner.email,
-              phone: selectedParkowner.phone,
-              password: selectedParkowner.password,
-              subscription: selectedParkowner.subscription.package,
-              subscriptionEndDate: moment(selectedParkowner.subscription_end_date),
-            }}
-            onFinish={handleEditSubmit}
-          >
-            <Form.Item label="Zones" name="zones">
-              <Input />
-            </Form.Item>
-            <Form.Item label="Active/Deactive" name="isActive">
-              <Select>
-                <Option value={true}>Active</Option>
-                <Option value={false}>Deactive</Option>
-              </Select>
-            </Form.Item>
+          <Form layout="vertical" initialValues={selectedParkowner} onFinish={handleEditSubmit}>
             <Form.Item label="Username" name="username">
               <Input />
             </Form.Item>
@@ -328,8 +396,8 @@ const Parkowners = () => {
             <Form.Item label="Phone" name="phone">
               <Input />
             </Form.Item>
-            <Form.Item label="Password" name="password">
-              <Input type="password" />
+            <Form.Item label="Zones" name="zones">
+              <Input />
             </Form.Item>
             <Form.Item label="Subscription" name="subscription">
               <Input />
@@ -338,33 +406,27 @@ const Parkowners = () => {
               <DatePicker />
             </Form.Item>
             <Button type="primary" htmlType="submit">
-              Submit
+              Save Changes
             </Button>
-            <Button onClick={() => setIsEditModalVisible(false)}>Cancel</Button>
           </Form>
         )}
       </StyledModal>
       <StyledModal
-        isOpen={isDetailsModalVisible}
-        onRequestClose={() => setIsDetailsModalVisible(false)}
-        contentLabel="Parkowner Details"
+        isOpen={isActivationModalVisible}
+        onRequestClose={() => setIsActivationModalVisible(false)}
+        contentLabel="Activate/Deactivate Parkowner"
       >
-        {selectedParkowner && (
-          <div>
-            <h2>Parkowner Details</h2>
-            <p>Zones: {selectedParkowner.zones}</p>
-            <p>Active/Deactive: {selectedParkowner.isActive ? "Active" : "Deactive"}</p>
-            <p>Username: {selectedParkowner.username}</p>
-            <p>Email: {selectedParkowner.email}</p>
-            <p>Phone: {selectedParkowner.phone}</p>
-            <p>Subscription: {selectedParkowner.subscription.package}</p>
-            <p>Subscription End Date: {moment(selectedParkowner.subscription_end_date).format("YYYY-MM-DD")}</p>
-            <p>Total Earnings: ${selectedParkowner.total_earnings.toFixed(2)}</p>
-            <p>Total Salary Cost: ${selectedParkowner.total_salary_cost.toFixed(2)}</p>
-            <p>Net Revenue: ${selectedParkowner.park_owner_net_revenue.toFixed(2)}</p>
-          </div>
-        )}
-        <Button onClick={() => setIsDetailsModalVisible(false)}>Close</Button>
+        <h2>{selectedParkowner?.is_active ? "Deactivate" : "Activate"} Parkowner</h2>
+        <p>
+          Are you sure you want to {selectedParkowner?.is_active ? "deactivate" : "activate"} this parkowner?
+        </p>
+        <Button
+          type="primary"
+          onClick={selectedParkowner?.is_active ? handleDeactivate : handleActivate}
+        >
+          {selectedParkowner?.is_active ? "Deactivate" : "Activate"}
+        </Button>
+        <Button onClick={() => setIsActivationModalVisible(false)}>Cancel</Button>
       </StyledModal>
     </ParkownersContainer>
   );
