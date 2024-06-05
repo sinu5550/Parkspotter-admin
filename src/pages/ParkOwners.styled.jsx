@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import Modal from "react-modal";
 
+
 export const ParkownersContainer = styled.div`
   background-color: #f8f9fa;
   color: #333;
@@ -56,6 +57,7 @@ export const Filters = styled.div`
 
     svg {
       margin-right: 10px;
+      font-size: 20px; 
     }
 
     &:hover {
@@ -109,15 +111,16 @@ export const ParkownerItem = styled.li`
 `;
 
 export const StyledModal = styled(Modal)`
-  background: #fff;
+  background: #f0f2f5;
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   max-width: 600px;
   margin: 50px auto;
 
   h2 {
     margin-top: 0;
+    color: #405189;
   }
 
   .ant-form-item {
