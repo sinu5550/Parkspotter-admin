@@ -71,7 +71,6 @@ const ViewSubscriptions = () => {
         if (!response.ok) throw new Error("Failed to fetch subscriptions")
         const data = await response.json()
         setSubscriptions(data)
-        setFilteredData(data)
       } catch (error) {
         setError(error.message)
       }
@@ -85,6 +84,7 @@ const ViewSubscriptions = () => {
         if (!response.ok) throw new Error("Failed to fetch park owners")
         const data = await response.json()
         setParkOwners(data)
+        setFilteredData(data)  // Setting initial filtered data to all park owners
       } catch (error) {
         setError(error.message)
       }
@@ -101,26 +101,29 @@ const ViewSubscriptions = () => {
     return subscriptionEndDate >= currentDate ? "Active" : "Expired"
   }
 
-  const getParkOwnerDetails = (subscriptionId) => {
-    const owner = parkOwners.find(
-      (owner) => owner.subscription_id === subscriptionId
-    )
-    return owner
+  const getSubscriptionDetails = (subscriptionId) => {
+    const subscription = subscriptions.find(sub => sub.id === subscriptionId)
+    return subscription
       ? {
-          name: `${owner.park_owner_id.first_name} ${owner.park_owner_id.last_name}`,
-          email: owner.park_owner_id.email,
+          name: subscription?.name,
+          amount: subscription?.amount,
+          price: subscription?.price,
+          discount: subscription?.discount,
+          total_amount: subscription?.total_amount,
         }
-      : { name: "Unknown", email: "Unknown" }
+      : { name: "Unknown", amount: "Unknown", price: "Unknown", discount: "Unknown", total_amount: "Unknown" }
   }
 
   const handleSearch = (value) => {
-    const filtered = subscriptions.filter((sub) => {
-      const ownerDetails = getParkOwnerDetails(sub.id)
+    const filtered = parkOwners.filter((owner) => {
+      const ownerDetails = owner?.park_owner_id
+      const subscriptionDetails = getSubscriptionDetails(owner?.subscription_id)
       return (
-        ownerDetails.name.toLowerCase().includes(value.toLowerCase()) ||
-        ownerDetails.email.toLowerCase().includes(value.toLowerCase()) ||
-        sub.start_date.includes(value) ||
-        sub.end_date.includes(value)
+        `${ownerDetails?.first_name} ${ownerDetails?.last_name}`.toLowerCase().includes(value.toLowerCase()) ||
+        ownerDetails?.email.toLowerCase().includes(value.toLowerCase()) ||
+        owner?.subscription_start_date.includes(value) ||
+        owner?.subscription_end_date.includes(value) ||
+        subscriptionDetails?.name.toLowerCase().includes(value.toLowerCase())
       )
     })
     setFilteredData(filtered)
@@ -140,17 +143,19 @@ const ViewSubscriptions = () => {
     setCurrentPage(page)
   }
 
-  const dataSource = filteredData.map((subscription) => {
-    const ownerDetails = getParkOwnerDetails(subscription.id)
+  const dataSource = filteredData.map((owner) => {
+    const ownerDetails = owner?.park_owner_id
+    const subscriptionDetails = getSubscriptionDetails(owner?.subscription_id)
     return {
-      key: subscription.id,
-      name: ownerDetails.name,
-      email: ownerDetails.email,
-      plan: subscription.package === 1 ? "Basic" : "Premium",
-      status: getStatus(subscription.end_date),
-      startDate: subscription.start_date,
-      endDate: subscription.end_date,
-      ...subscription,
+      key: owner?.id,
+      name: `${ownerDetails?.first_name} ${ownerDetails?.last_name}`,
+      email: ownerDetails?.email,
+      plan: subscriptionDetails?.name,
+      status: getStatus(owner?.subscription_end_date),
+      startDate: owner?.subscription_start_date,
+      endDate: owner?.subscription_end_date,
+      amount: subscriptionDetails?.total_amount,
+      ...owner,
     }
   })
 
@@ -169,7 +174,7 @@ const ViewSubscriptions = () => {
         ) : (
           <>
             <Search
-              placeholder="Search by name, email, start date, end date"
+              placeholder="Search by name, email, start date, end date, plan name"
               onSearch={handleSearch}
               style={{ marginBottom: 20 }}
               enterButton
@@ -197,7 +202,7 @@ const ViewSubscriptions = () => {
                   key: "status",
                   render: (status) => (
                     <Tag color={status === "Active" ? "green" : "volcano"}>
-                      {status.toUpperCase()}
+                      {status?.toUpperCase()}
                     </Tag>
                   ),
                 },
@@ -247,33 +252,33 @@ const ViewSubscriptions = () => {
         >
           <Descriptions bordered layout="vertical">
             <Descriptions.Item label="Name">
-              {getParkOwnerDetails(selectedSubscription.id).name}
+              {selectedSubscription?.name}
             </Descriptions.Item>
             <Descriptions.Item label="Email">
-              {getParkOwnerDetails(selectedSubscription.id).email}
+              {selectedSubscription?.email}
             </Descriptions.Item>
             <Descriptions.Item label="Plan">
-              {selectedSubscription.package === 1 ? "Basic" : "Premium"}
+              {selectedSubscription?.plan}
             </Descriptions.Item>
             <Descriptions.Item label="Status">
               <Tag
                 color={
-                  getStatus(selectedSubscription.end_date) === "Active"
+                  getStatus(selectedSubscription?.endDate) === "Active"
                     ? "green"
                     : "volcano"
                 }
               >
-                {getStatus(selectedSubscription.end_date)}
+                {getStatus(selectedSubscription?.endDate)}
               </Tag>
             </Descriptions.Item>
             <Descriptions.Item label="Start Date">
-              {selectedSubscription.start_date}
+              {selectedSubscription?.startDate}
             </Descriptions.Item>
             <Descriptions.Item label="End Date">
-              {selectedSubscription.end_date}
+              {selectedSubscription?.endDate}
             </Descriptions.Item>
             <Descriptions.Item label="Amount">
-              {selectedSubscription.amount}
+              {selectedSubscription?.amount}
             </Descriptions.Item>
           </Descriptions>
         </StyledModal>
@@ -283,4 +288,3 @@ const ViewSubscriptions = () => {
 }
 
 export default ViewSubscriptions
-// original

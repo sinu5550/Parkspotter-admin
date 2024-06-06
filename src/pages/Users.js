@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react"
-import { FaSearch, FaUserTimes } from "react-icons/fa"
-import { Bar, Line, Doughnut } from "react-chartjs-2"
+import React, { useEffect, useState } from "react";
+import { Table, Input, Button, Space, Statistic, Row, Col, Pagination, Modal, Card } from "antd";
+import { SearchOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import { Bar, Line, Doughnut } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -13,19 +14,8 @@ import {
   Tooltip,
   Legend,
   Filler,
-} from "chart.js"
-import {
-  ChartBox,
-  Charts,
-  Header,
-  SearchBar,
-  StatBox,
-  Stats,
-  UsersContainer,
-  UserTable,
-  Pagination,
-  PaginationButton,
-} from "./Users.styled"
+} from "chart.js";
+import styled from "styled-components";
 
 ChartJS.register(
   CategoryScale,
@@ -38,52 +28,118 @@ ChartJS.register(
   Tooltip,
   Legend,
   Filler
-)
+);
+
+const UsersContainer = styled.div`
+  padding: 20px;
+`;
+
+const Charts = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+`;
+
+const ChartBox = styled.div`
+  flex: 1;
+  min-width: 300px;
+`;
+
+const StatisticCard = styled(Card)`
+  .ant-card-body {
+    padding: 12px;
+  }
+`;
 
 const Users = () => {
-  const [users, setUsers] = useState([])
-  const [search, setSearch] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const usersPerPage = 5
+  const [users, setUsers] = useState([]);
+  const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const usersPerPage = 5;
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const response = await fetch(
           "https://parkspotter-backened.onrender.com/customer/customer-list/"
-        )
-        const data = await response.json()
-        setUsers(data)
+        );
+        const data = await response.json();
+        setUsers(data);
       } catch (error) {
-        console.error("Error fetching users:", error)
+        console.error("Error fetching users:", error);
       }
-    }
+    };
 
-    fetchUsers()
-  }, [])
+    fetchUsers();
+  }, []);
 
   const handleSearchChange = (event) => {
-    setSearch(event.target.value)
-  }
+    setSearch(event.target.value);
+  };
 
   const filteredUsers = users.filter((user) =>
     user.customer_id.username.toLowerCase().includes(search.toLowerCase())
-  )
+  );
 
-  const handleRemoveUser = (userId) => {
-    setUsers(users.filter((user) => user.id !== userId))
-  }
+  const handleToggleUserStatus = async (userId, isActive) => {
+    const token = localStorage.getItem("token");
+    const url = `https://parkspotter-backened.onrender.com/accounts/user_activation/${userId}/${isActive ? "deactivate" : "activate"}/`;
 
-  const indexOfLastUser = currentPage * usersPerPage
-  const indexOfFirstUser = indexOfLastUser - usersPerPage
-  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser)
+    try {
+      await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Token ${token}`,
+        },
+        body: JSON.stringify({ user_type: "customer" }),
+      });
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber)
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.id === userId
+            ? {
+                ...user,
+                customer_id: {
+                  ...user.customer_id,
+                  is_active: isActive ? 0 : 1,
+                },
+              }
+            : user
+        )
+      );
+    } catch (error) {
+      console.error("Error toggling user status:", error);
+    }
+  };
 
-  const totalUsers = users.length
-  const activeUsers = users.filter((user) => user.points > 0).length
-  const inactiveUsers = totalUsers - activeUsers
-  const bannedUsers = users.filter((user) => user.customer_id.is_active === 0).length
+  const showModal = (user) => {
+    setSelectedUser(user);
+    setIsModalVisible(true);
+  };
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+    setSelectedUser(null);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    setSelectedUser(null);
+  };
+
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const totalUsers = users.length;
+  const activeUsers = users.filter((user) => user.points > 0).length;
+  const inactiveUsers = totalUsers - activeUsers;
+  const bannedUsers = users.filter((user) => user.customer_id.is_active === 0).length;
 
   const userGrowthData = {
     labels: [],
@@ -96,7 +152,7 @@ const Users = () => {
         fill: true,
       },
     ],
-  }
+  };
 
   const monthMap = {
     0: "January",
@@ -111,18 +167,18 @@ const Users = () => {
     9: "October",
     10: "November",
     11: "December",
-  }
+  };
 
-  const userCountByMonth = new Array(12).fill(0)
+  const userCountByMonth = new Array(12).fill(0);
 
   users.forEach((user) => {
-    const joinedDate = new Date(user.joined_date)
-    const month = joinedDate.getMonth()
-    userCountByMonth[month] += 1
-  })
+    const joinedDate = new Date(user.joined_date);
+    const month = joinedDate.getMonth();
+    userCountByMonth[month] += 1;
+  });
 
-  userGrowthData.labels = Object.values(monthMap)
-  userGrowthData.datasets[0].data = userCountByMonth
+  userGrowthData.labels = Object.values(monthMap);
+  userGrowthData.datasets[0].data = userCountByMonth;
 
   const userStatusData = {
     labels: ["Active", "Inactive", "Banned"],
@@ -132,7 +188,7 @@ const Users = () => {
         backgroundColor: ["#2ecc71", "#e74c3c", "#95a5a6"],
       },
     ],
-  }
+  };
 
   const userActivityData = {
     labels: [
@@ -155,106 +211,161 @@ const Users = () => {
         pointHoverRadius: 8,
       },
     ],
-  }
+  };
 
   users.forEach((user) => {
-    const joinedDate = new Date(user.joined_date)
-    const dayOfWeek = joinedDate.getDay()
-    userActivityData.datasets[0].data[dayOfWeek] += user.points
-  })
+    const joinedDate = new Date(user.joined_date);
+    const dayOfWeek = joinedDate.getDay();
+    userActivityData.datasets[0].data[dayOfWeek] += user.points;
+  });
+
+  const columns = [
+    {
+      title: "Username",
+      dataIndex: ["customer_id", "username"],
+      key: "username",
+      render: (text, record) => (
+        <Button type="link" onClick={() => showModal(record)}>
+          {text}
+        </Button>
+      ),
+    },
+    {
+      title: "Email",
+      dataIndex: ["customer_id", "email"],
+      key: "email",
+    },
+    {
+      title: "First Name",
+      dataIndex: ["customer_id", "first_name"],
+      key: "first_name",
+    },
+    {
+      title: "Last Name",
+      dataIndex: ["customer_id", "last_name"],
+      key: "last_name",
+    },
+    {
+      title: "Mobile",
+      dataIndex: "mobile_no",
+      key: "mobile_no",
+    },
+    {
+      title: "Vehicle Brand",
+      dataIndex: "vehicle_brand",
+      key: "vehicle_brand",
+    },
+    {
+      title: "Plate Number",
+      dataIndex: "plate_number",
+      key: "plate_number",
+    },
+    {
+      title: "Joined Date",
+      dataIndex: "joined_date",
+      key: "joined_date",
+      render: (text) => new Date(text).toLocaleDateString(),
+    },
+    {
+      title: "Points",
+      dataIndex: "points",
+      key: "points",
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_, record) => (
+        <Button
+          type={record.customer_id.is_active ? "primary" : "danger"}
+          icon={record.customer_id.is_active ? <CloseOutlined /> : <CheckOutlined />}
+          onClick={() => handleToggleUserStatus(record.id, record.customer_id.is_active)}
+        >
+          {record.customer_id.is_active ? "Deactivate" : "Activate"}
+        </Button>
+      ),
+    },
+  ];
 
   return (
     <UsersContainer>
-      <Stats>
-        <StatBox>
-          <h2>Total Users</h2>
-          <p>{totalUsers}</p>
-        </StatBox>
-        <StatBox>
-          <h2>Active Users</h2>
-          <p className="increase">{activeUsers}</p>
-        </StatBox>
-        <StatBox>
-          <h2>Inactive Users</h2>
-          <p className="decrease">{inactiveUsers}</p>
-        </StatBox>
-        <StatBox>
-          <h2>Banned Users</h2>
-          <p className="decrease">{bannedUsers}</p>
-        </StatBox>
-      </Stats>
-      <Header>
-        <SearchBar>
-          <FaSearch />
-          <input
-            type="text"
-            placeholder="Search users..."
-            value={search}
-            onChange={handleSearchChange}
-          />
-        </SearchBar>
-      </Header>
-      <UserTable>
-        <thead>
-          <tr>
-            <th>Username</th>
-            <th>Email</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Mobile</th>
-            <th>Vehicle Brand</th>
-            <th>Plate Number</th>
-            <th>Joined Date</th>
-            <th>Points</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {currentUsers.map((user) => (
-            <tr key={user.id}>
-              <td>{user.customer_id.username}</td>
-              <td>{user.customer_id.email}</td>
-              <td>{user.customer_id.first_name}</td>
-              <td>{user.customer_id.last_name}</td>
-              <td>{user.mobile_no}</td>
-              <td>{user.vehicle_brand}</td>
-              <td>{user.plate_number}</td>
-              <td>{new Date(user.joined_date).toLocaleDateString()}</td>
-              <td>{user.points}</td>
-              <td>
-                <button className="userActivateDeactivateToggle" onClick={() => handleRemoveUser(user.id)}>
-                  <FaUserTimes />
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </UserTable>
-      <Pagination>
-        {Array.from({
-          length: Math.ceil(filteredUsers.length / usersPerPage),
-        }).map((_, index) => (
-          <PaginationButton key={index} onClick={() => paginate(index + 1)}>
-            {index + 1}
-          </PaginationButton>
-        ))}
-      </Pagination>
+      <Row gutter={16}>
+        <Col span={6}>
+          <StatisticCard>
+            <Statistic title="Total Users" value={totalUsers} />
+          </StatisticCard>
+        </Col>
+        <Col span={6}>
+          <StatisticCard>
+            <Statistic title="Active Users" value={activeUsers} valueStyle={{ color: "#3f8600" }} />
+          </StatisticCard>
+        </Col>
+        <Col span={6}>
+          <StatisticCard>
+            <Statistic title="Inactive Users" value={inactiveUsers} valueStyle={{ color: "#cf1322" }} />
+          </StatisticCard>
+        </Col>
+        <Col span={6}>
+          <StatisticCard>
+            <Statistic title="Banned Users" value={bannedUsers} valueStyle={{ color: "#cf1322" }} />
+          </StatisticCard>
+        </Col>
+      </Row>
+      <Space style={{ margin: "20px 0" }}>
+        <Input
+          placeholder="Search users..."
+          prefix={<SearchOutlined />}
+          value={search}
+          onChange={handleSearchChange}
+        />
+      </Space>
+      <Table
+        columns={columns}
+        dataSource={currentUsers}
+        pagination={false}
+        rowKey="id"
+      />
+      <Pagination
+        current={currentPage}
+        pageSize={usersPerPage}
+        total={filteredUsers.length}
+        onChange={paginate}
+        style={{ marginTop: "20px", textAlign: "right" }}
+      />
       <Charts>
-        <ChartBox type="1st">
+        <ChartBox>
           <h3>User Growth</h3>
           <Line data={userGrowthData} />
         </ChartBox>
-        <ChartBox type="2nd">
+        <ChartBox>
           <h3>User Status</h3>
           <Doughnut data={userStatusData} />
         </ChartBox>
+        <ChartBox>
+          <h3>Weekly Activity</h3>
+          <Bar data={userActivityData} />
+        </ChartBox>
       </Charts>
-      <ChartBox type="3rd">
-        <h3>Weekly Activity</h3>
-        <Bar data={userActivityData} />
-      </ChartBox>
+      {selectedUser && (
+        <Modal
+          title="User Details"
+          visible={isModalVisible}
+          onOk={handleOk}
+          onCancel={handleCancel}
+        >
+          <p><strong>Username:</strong> {selectedUser.customer_id.username}</p>
+          <p><strong>Email:</strong> {selectedUser.customer_id.email}</p>
+          <p><strong>First Name:</strong> {selectedUser.customer_id.first_name}</p>
+          <p><strong>Last Name:</strong> {selectedUser.customer_id.last_name}</p>
+          <p><strong>Mobile:</strong> {selectedUser.mobile_no}</p>
+          <p><strong>Vehicle Brand:</strong> {selectedUser.vehicle_brand}</p>
+          <p><strong>Plate Number:</strong> {selectedUser.plate_number}</p>
+          <p><strong>Joined Date:</strong> {new Date(selectedUser.joined_date).toLocaleDateString()}</p>
+          <p><strong>Points:</strong> {selectedUser.points}</p>
+          <p><strong>Status:</strong> {selectedUser.customer_id.is_active ? "Active" : "Inactive"}</p>
+        </Modal>
+      )}
     </UsersContainer>
-  )
-}
+  );
+};
 
-export default Users
+export default Users;

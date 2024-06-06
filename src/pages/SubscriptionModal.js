@@ -334,3 +334,4 @@ const SubscriptionModal = ({ isOpen, onClose, subscriptions, setSubscriptions })
 };
 
 export default SubscriptionModal;
+// original
