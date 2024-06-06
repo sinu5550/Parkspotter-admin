@@ -11,7 +11,7 @@ import ParkingZones from "./ParkingZones"
 // import AdminManagement from "./AdminManagement"
 import Parkowners from "./Parkowners"
 import Users from "./Users"
-import Zones from "./Zones"
+// import Zones from "./Zones"
 import Bookings from "./Bookings"
 import ManagePlans from "./ManagePlans"
 

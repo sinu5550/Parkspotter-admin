@@ -222,7 +222,7 @@ const Users = () => {
               <td>{new Date(user.joined_date).toLocaleDateString()}</td>
               <td>{user.points}</td>
               <td>
-                <button onClick={() => handleRemoveUser(user.id)}>
+                <button className="userActivateDeactivateToggle" onClick={() => handleRemoveUser(user.id)}>
                   <FaUserTimes />
                 </button>
               </td>
