@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react";
 import {
   Card,
   Col,
@@ -9,25 +9,25 @@ import {
   Modal,
   Button,
   Pagination,
-} from "antd"
-import axios from "axios"
-import styled from "styled-components"
+} from "antd";
+import axios from "axios";
+import styled from "styled-components";
 
-const { Option } = Select
-const { Search } = Input
+const { Option } = Select;
+const { Search } = Input;
 
 const Container = styled.div`
   padding: 20px;
   background-color: #f0f2f5;
   min-height: 100vh;
-`
+`;
 
 const FilterContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-`
+`;
 
 const BookingCard = styled(Card)`
   width: 100%;
@@ -42,7 +42,7 @@ const BookingCard = styled(Card)`
     transform: translateY(-5px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
-`
+`;
 
 const InfoBox = styled.div`
   padding: 10px;
@@ -54,7 +54,7 @@ const InfoBox = styled.div`
   display: flex;
   justify-content: space-around;
   align-items: center;
-`
+`;
 
 const CustomerInfo = styled.div`
   background-color: #faeafa;
@@ -62,7 +62,7 @@ const CustomerInfo = styled.div`
   border-radius: 8px;
   margin-top: 8px;
   color: #333;
-`
+`;
 
 const EmployeeInfo = styled.div`
   background-color: #e6f7ff;
@@ -70,7 +70,7 @@ const EmployeeInfo = styled.div`
   border-radius: 8px;
   margin-top: 8px;
   color: #333;
-`
+`;
 
 const ModalContent = styled.div`
   p {
@@ -79,99 +79,99 @@ const ModalContent = styled.div`
   strong {
     color: #202123;
   }
-`
+`;
 
 const Bookings = () => {
-  const [bookings, setBookings] = useState([])
-  const [customers, setCustomers] = useState([])
-  const [employees, setEmployees] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [sortOrder, setSortOrder] = useState("asc")
-  const [selectedBooking, setSelectedBooking] = useState(null)
-  const [modalVisible, setModalVisible] = useState(false)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [pageSize] = useState(10)
-  const [totalEmployeeBookings, setTotalEmployeeBookings] = useState(0)
-  const [totalCustomerBookings, setTotalCustomerBookings] = useState(0)
+  const [bookings, setBookings] = useState([]);
+  const [customers, setCustomers] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10);
+  const [totalEmployeeBookings, setTotalEmployeeBookings] = useState(0);
+  const [totalCustomerBookings, setTotalCustomerBookings] = useState(0);
 
   useEffect(() => {
-    fetchData()
-  }, [currentPage, searchTerm, sortOrder, fetchData])
+    fetchData();
+  }, [currentPage, searchTerm, sortOrder]);
 
   const fetchData = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       const bookingResponse = await axios.get(
         `https://parkspotter-backened.onrender.com/accounts/bookings/?page=${currentPage}`
-      )
+      );
       const customerResponse = await axios.get(
         `https://parkspotter-backened.onrender.com/customer/customer-list/`
-      )
+      );
       const employeeResponse = await axios.get(
         `https://parkspotter-backened.onrender.com/accounts/employee-list/`
-      )
+      );
 
       let filteredBookings = bookingResponse.data.filter((booking) =>
         booking.vehicle.plate_number.includes(searchTerm)
-      )
+      );
 
       if (sortOrder === "asc") {
         filteredBookings = filteredBookings.sort(
           (a, b) => new Date(a.booking_time) - new Date(b.booking_time)
-        )
+        );
       } else {
         filteredBookings = filteredBookings.sort(
           (a, b) => new Date(b.booking_time) - new Date(a.booking_time)
-        )
+        );
       }
 
       const customerBookingsCount = filteredBookings.filter(
         (booking) => booking.customer
-      ).length
+      ).length;
       const employeeBookingsCount = filteredBookings.filter(
         (booking) => booking.employee
-      ).length
+      ).length;
 
-      setBookings(filteredBookings)
-      setCustomers(customerResponse.data)
-      setEmployees(employeeResponse.data)
-      setTotalCustomerBookings(customerBookingsCount)
-      setTotalEmployeeBookings(employeeBookingsCount)
-      setLoading(false)
+      setBookings(filteredBookings);
+      setCustomers(customerResponse.data);
+      setEmployees(employeeResponse.data);
+      setTotalCustomerBookings(customerBookingsCount);
+      setTotalEmployeeBookings(employeeBookingsCount);
+      setLoading(false);
     } catch (error) {
-      console.error("Error fetching data:", error)
-      setLoading(false)
+      console.error("Error fetching data:", error);
+      setLoading(false);
     }
-  }
+  };
 
   const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value)
-    setCurrentPage(1) // Reset to the first page when search term changes
-  }
+    setSearchTerm(event.target.value);
+    setCurrentPage(1); // Reset to the first page when search term changes
+  };
 
   const handleSortOrderChange = (value) => {
-    setSortOrder(value)
-    setCurrentPage(1) // Reset to the first page when sort order changes
-  }
+    setSortOrder(value);
+    setCurrentPage(1); // Reset to the first page when sort order changes
+  };
 
   const getCustomerData = (customerId) => {
-    return customers.find((customer) => customer.customer_id.id === customerId)
-  }
+    return customers.find((customer) => customer.customer_id.id === customerId);
+  };
 
   const getEmployeeData = (employeeId) => {
-    return employees.find((employee) => employee.id === employeeId)
-  }
+    return employees.find((employee) => employee.id === employeeId);
+  };
 
   const showModal = (booking) => {
-    setSelectedBooking(booking)
-    setModalVisible(true)
-  }
+    setSelectedBooking(booking);
+    setModalVisible(true);
+  };
 
   const handleModalClose = () => {
-    setSelectedBooking(null)
-    setModalVisible(false)
-  }
+    setSelectedBooking(null);
+    setModalVisible(false);
+  };
 
   return (
     <Container>
@@ -200,8 +200,8 @@ const Bookings = () => {
         <>
           <Row gutter={[16, 16]}>
             {bookings.map((booking) => {
-              const customerData = getCustomerData(booking.customer)
-              const employeeData = getEmployeeData(booking.employee)
+              const customerData = getCustomerData(booking.customer);
+              const employeeData = getEmployeeData(booking.employee);
               return (
                 <Col key={booking.id} span={8}>
                   <BookingCard
@@ -248,7 +248,7 @@ const Bookings = () => {
                     )}
                   </BookingCard>
                 </Col>
-              )
+              );
             })}
           </Row>
           <Pagination
@@ -366,7 +366,7 @@ const Bookings = () => {
         </Modal>
       )}
     </Container>
-  )
-}
+  );
+};
 
-export default Bookings
+export default Bookings;
