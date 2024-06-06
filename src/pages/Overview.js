@@ -354,11 +354,167 @@ const Overview = () => {
       </SalesLocations>
       <div>
         <h2>Monthly Earnings</h2>
-        <Bar data={chartData} />
+        <Bar
+          data={chartData}
+          options={{
+            plugins: {
+              legend: {
+                display: true,
+                position: "bottom",
+                labels: {
+                  font: {
+                    size: 14,
+                    family: "Arial",
+                  },
+                  color: "#333",
+                },
+              },
+              tooltip: {
+                backgroundColor: "rgba(0,0,0,0.7)",
+                titleFont: {
+                  size: 16,
+                },
+                bodyFont: {
+                  size: 14,
+                },
+                footerFont: {
+                  size: 12,
+                },
+              },
+              gradient: {
+                enabled: true,
+                gradient: {
+                  type: "linear",
+                  colors: [
+                    {
+                      offset: 0,
+                      color: "#ff9a9e",
+                    },
+                    {
+                      offset: 100,
+                      color: "#fad0c4",
+                    },
+                  ],
+                },
+              },
+            },
+            scales: {
+              x: {
+                ticks: {
+                  font: {
+                    size: 14,
+                  },
+                  color: "#333",
+                },
+                grid: {
+                  color: "rgba(0,0,0,0.1)",
+                },
+              },
+              y: {
+                ticks: {
+                  font: {
+                    size: 14,
+                  },
+                  color: "#333",
+                },
+                grid: {
+                  color: "rgba(0,0,0,0.1)",
+                },
+              },
+            },
+            animations: {
+              tension: {
+                duration: 1000,
+                easing: "easeInOutElastic",
+                from: 0.5,
+                to: 0,
+                loop: true,
+              },
+            },
+          }}
+        />
       </div>
       <div>
         <h2>Monthly Bookings</h2>
-        <Line data={lineChartData} />
+        <Line
+          data={lineChartData}
+          options={{
+            plugins: {
+              legend: {
+                display: true,
+                position: "bottom",
+                labels: {
+                  font: {
+                    size: 14,
+                    family: "Arial",
+                  },
+                  color: "#333",
+                },
+              },
+              tooltip: {
+                backgroundColor: "rgba(0,0,0,0.7)",
+                titleFont: {
+                  size: 16,
+                },
+                bodyFont: {
+                  size: 14,
+                },
+                footerFont: {
+                  size: 12,
+                },
+              },
+              gradient: {
+                enabled: true,
+                gradient: {
+                  type: "linear",
+                  colors: [
+                    {
+                      offset: 0,
+                      color: "#a18cd1",
+                    },
+                    {
+                      offset: 100,
+                      color: "#fbc2eb",
+                    },
+                  ],
+                },
+              },
+            },
+            scales: {
+              x: {
+                ticks: {
+                  font: {
+                    size: 14,
+                  },
+                  color: "#333",
+                },
+                grid: {
+                  color: "rgba(0,0,0,0.1)",
+                },
+              },
+              y: {
+                ticks: {
+                  font: {
+                    size: 14,
+                  },
+                  color: "#333",
+                },
+                grid: {
+                  color: "rgba(0,0,0,0.1)",
+                },
+              },
+            },
+            animations: {
+              tension: {
+                duration: 1000,
+                easing: "easeInOutElastic",
+                from: 0.5,
+                to: 0,
+                loop: true,
+              },
+            },
+          }}
+        />
       </div>
     </OverviewContainer>
   )
