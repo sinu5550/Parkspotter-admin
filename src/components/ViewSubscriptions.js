@@ -15,7 +15,6 @@ import styled from "styled-components"
 const SubscriptionsContainer = styled.div`
   background-color: #f0f2f5;
   min-height: 100vh;
-  padding: 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -33,7 +32,7 @@ const StyledTable = styled(Table)`
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
   .ant-table-thead > tr > th {
-    background-color: #fafafa;
+    background-color: #9a9afa;
     font-weight: bold;
     text-align: center;
   }
