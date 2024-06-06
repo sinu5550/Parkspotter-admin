@@ -21,6 +21,7 @@ export const Header = styled.div`
 export const SearchBar = styled.div`
   display: flex;
   align-items: center;
+  margin-left: auto;
   background-color: #fff;
   padding: 10px;
   border-radius: 5px;
@@ -100,7 +101,8 @@ export const UserTable = styled.table`
   border-collapse: collapse;
   margin-bottom: 20px;
 
-  th, td {
+  th,
+  td {
     padding: 10px;
     text-align: left;
     border-bottom: 1px solid #ddd;
@@ -143,8 +145,7 @@ export const PaginationButton = styled.button`
 export const Charts = styled.div`
   display: flex;
   justify-content: space-around;
-//   flex-wrap: wrap;
-
+  //   flex-wrap: wrap;
 `
 
 export const ChartBox = styled.div`
@@ -155,11 +156,11 @@ export const ChartBox = styled.div`
   margin: 10px;
   width: ${({ type }) => {
     if (type === "1st") {
-      return "70%";
+      return "70%"
     } else if (type === "2nd") {
-      return "30%";
+      return "30%"
     } else {
-      return "100%";
+      return "100%"
     }
   }};
-`;
+`
