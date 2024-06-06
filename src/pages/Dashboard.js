@@ -49,7 +49,7 @@ const Dashboard = ({ collapsed, toggleCollapse }) => {
             <Route path="subscriptions" element={<ViewSubscriptions />} />
             <Route path="parkowners" element={<Parkowners />} />
             <Route path="users" element={<Users />} />
-            <Route path="zones" element={<Zones />} />
+            {/* <Route path="zones" element={<Zones />} /> */}
             <Route path="manage-plans" element={<ManagePlans />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>

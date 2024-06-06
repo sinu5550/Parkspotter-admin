@@ -130,9 +130,9 @@ const Sidebar = ({ collapsed, toggleCollapse }) => {
               <li>
                 <SubMenuLink to="/dashboard/users">Users</SubMenuLink>
               </li>
-              <li>
+              {/* <li>
                 <SubMenuLink to="/dashboard/zones">Zones</SubMenuLink>
-              </li>
+              </li> */}
             </SubMenuList>
           </li>
           <li>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { FaSearch, FaFilter, FaUserPlus, FaUserTimes } from "react-icons/fa"
+import { FaSearch, FaUserTimes } from "react-icons/fa"
 import { Bar, Line, Doughnut } from "react-chartjs-2"
 import {
   Chart as ChartJS,
@@ -17,7 +17,6 @@ import {
 import {
   ChartBox,
   Charts,
-  Filters,
   Header,
   SearchBar,
   StatBox,
@@ -84,7 +83,7 @@ const Users = () => {
   const totalUsers = users.length
   const activeUsers = users.filter((user) => user.points > 0).length
   const inactiveUsers = totalUsers - activeUsers
-  const bannedUsers = users.filter((user) => user.points < 0).length
+  const bannedUsers = users.filter((user) => user.customer_id.is_active === 0).length
 
   const userGrowthData = {
     labels: [],
@@ -166,32 +165,6 @@ const Users = () => {
 
   return (
     <UsersContainer>
-      <Header>
-        <h1>Users</h1>
-        <SearchBar>
-          <FaSearch />
-          <input
-            type="text"
-            placeholder="Search users..."
-            value={search}
-            onChange={handleSearchChange}
-          />
-        </SearchBar>
-      </Header>
-      <Filters>
-        <button>
-          <FaFilter />
-          Filter
-        </button>
-        <button>
-          <FaUserPlus />
-          Add User
-        </button>
-        <button>
-          <FaUserTimes />
-          Remove User
-        </button>
-      </Filters>
       <Stats>
         <StatBox>
           <h2>Total Users</h2>
@@ -210,6 +183,17 @@ const Users = () => {
           <p className="decrease">{bannedUsers}</p>
         </StatBox>
       </Stats>
+      <Header>
+        <SearchBar>
+          <FaSearch />
+          <input
+            type="text"
+            placeholder="Search users..."
+            value={search}
+            onChange={handleSearchChange}
+          />
+        </SearchBar>
+      </Header>
       <UserTable>
         <thead>
           <tr>

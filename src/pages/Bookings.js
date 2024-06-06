@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Card,
   Col,
@@ -95,11 +95,7 @@ const Bookings = () => {
   const [totalEmployeeBookings, setTotalEmployeeBookings] = useState(0);
   const [totalCustomerBookings, setTotalCustomerBookings] = useState(0);
 
-  useEffect(() => {
-    fetchData();
-  }, [currentPage, searchTerm, sortOrder]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const bookingResponse = await axios.get(
@@ -143,7 +139,11 @@ const Bookings = () => {
       console.error("Error fetching data:", error);
       setLoading(false);
     }
-  };
+  }, [currentPage, searchTerm, sortOrder]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
