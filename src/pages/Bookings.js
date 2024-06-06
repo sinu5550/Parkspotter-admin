@@ -97,7 +97,7 @@ const Bookings = () => {
 
   useEffect(() => {
     fetchData()
-  }, [currentPage, searchTerm, sortOrder])
+  }, [currentPage, searchTerm, sortOrder, fetchData])
 
   const fetchData = async () => {
     try {
