@@ -212,6 +212,21 @@ const Overview = () => {
       divisions[a] > divisions[b] ? a : b
     )
 
+  const exportToCSV = () => {
+    const headers = ["Division", "Ratio (%)"]
+    const rows = Object.entries(divisionRatios).map(([division, ratio]) => [division, ratio])
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [headers.join(","), ...rows.map(row => row.join(","))].join("\n")
+    const encodedUri = encodeURI(csvContent)
+    const link = document.createElement("a")
+    link.setAttribute("href", encodedUri)
+    link.setAttribute("download", "division_ratios.csv")
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
   return (
     <OverviewContainer>
       <Greeting>
@@ -274,59 +289,69 @@ const Overview = () => {
         </RevenueStats>
       </RevenueSection>
       <SalesLocations>
-  <h2>Sales by Locations</h2>
-  <Map
-    initialViewState={{
-      latitude: 23.813334,
-      longitude: 90.424164,
-      zoom: 7.5,
-    }}
-    style={{ width: "100%", height: 400 }}
-    mapStyle="mapbox://styles/mapbox/streets-v11"
-    mapboxAccessToken={MAPBOX_TOKEN}
-  >
-    {parkOwnerData &&
-      parkOwnerData
-        .filter(owner => owner.latitude && owner.longitude) 
-        .map(owner => (
-          <Marker
-            key={owner.id}
-            latitude={parseFloat(owner.latitude)}
-            longitude={parseFloat(owner.longitude)}
-          >
-            <div
-              style={{
-                backgroundColor: owner.area === maxDivision ? "red" : "lightblue",
-                width: "30px",
-                height: "30px",
-                borderRadius: "50%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <div
-                style={{
-                  backgroundColor: "white",
-                  width: "15px",
-                  height: "15px",
-                  borderRadius: "50%",
-                }}
-              ></div>
-            </div>
-          </Marker>
-        ))}
-  </Map>
-  <ul>
-    {Object.entries(divisionRatios).map(([division, ratio]) => (
-      <li key={division}>
-        <span style={{ fontWeight: "bold" }}>{division}</span>
-        <span>{ratio}%</span>
-      </li>
-    ))}
-  </ul>
-  <button>Export Report</button>
-</SalesLocations>
+        <h2>Sales by Locations</h2>
+        <Map
+          initialViewState={{
+            latitude: 23.813334,
+            longitude: 90.424164,
+            zoom: 7.5,
+          }}
+          style={{ width: "100%", height: 400 }}
+          mapStyle="mapbox://styles/mapbox/streets-v11"
+          mapboxAccessToken={MAPBOX_TOKEN}
+        >
+          {parkOwnerData &&
+            parkOwnerData
+              .filter(owner => owner.latitude && owner.longitude) 
+              .map(owner => (
+                <Marker
+                  key={owner.id}
+                  latitude={parseFloat(owner.latitude)}
+                  longitude={parseFloat(owner.longitude)}
+                >
+                  <div
+                    style={{
+                      backgroundColor: owner.area === maxDivision ? "red" : "lightblue",
+                      width: "30px",
+                      height: "30px",
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <div
+                      style={{
+                        backgroundColor: "white",
+                        width: "15px",
+                        height: "15px",
+                        borderRadius: "50%",
+                      }}
+                    ></div>
+                  </div>
+                </Marker>
+              ))}
+        </Map>
+        <table style={{ width: "100%", marginTop: "20px", borderCollapse: "collapse" }}>
+          <thead>
+            <tr>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>Division</th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>Ratio (%)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.entries(divisionRatios).map(([division, ratio]) => (
+              <tr key={division}>
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}>{division}</td>
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}>{ratio}%</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <button onClick={exportToCSV} style={{ marginTop: "20px", padding: "10px 20px" }}>
+          Export Report
+        </button>
+      </SalesLocations>
       <div>
         <h2>Monthly Earnings</h2>
         <Bar data={chartData} />
@@ -340,8 +365,3 @@ const Overview = () => {
 }
 
 export default Overview
-// original
-
-// pk.eyJ1IjoibW93dWoiLCJhIjoiY2x3ZHJjcWs4MDRrMjJqcXBmZnIwMHpvNCJ9.YGSlU2XkHa7quHa1Mnd2Pg
-
-
